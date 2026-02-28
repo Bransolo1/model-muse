@@ -2,8 +2,42 @@
 # utils_logging.R — Structured logging for Sensehub
 # ============================================================================
 # Lightweight structured logging using message() for compatibility with
-# all deployment targets (Posit Connect, shinyapps.io, Docker).
-# Logs are JSON-structured for easy parsing by log aggregators.
+# all deployment targets. When possible, also appends to a date-named log file
+# in the user's Sensehub log directory (see get_log_file_path()).
+
+#' Return the Sensehub log directory (platform-specific)
+#' Creates the directory if it doesn't exist; returns NULL if creation fails.
+get_sensehub_log_dir <- function() {
+  if (.Platform$OS.type == "windows") {
+    base <- Sys.getenv("LOCALAPPDATA", NA_character_)
+    if (is.na(base) || !nzchar(base)) base <- Sys.getenv("USERPROFILE", "~")
+    log_dir <- file.path(base, "Sensehub", "logs")
+  } else {
+    base <- Sys.getenv("XDG_DATA_HOME", NA_character_)
+    if (is.na(base) || !nzchar(base)) {
+      base <- path.expand("~/.local/share")
+    }
+    log_dir <- file.path(base, "Sensehub", "logs")
+    if (Sys.info()["sysname"] == "Darwin") {
+      log_dir <- path.expand("~/Library/Application Support/Sensehub/logs")
+    }
+  }
+  if (!dir.exists(log_dir)) {
+    ok <- tryCatch(dir.create(log_dir, recursive = TRUE, showWarnings = FALSE),
+                  error = function(e) FALSE)
+    if (!ok) return(NULL)
+  }
+  log_dir
+}
+
+#' Path to today's log file (for UI messages: "See log at ...")
+#' Returns NULL if file logging is not available.
+get_log_file_path <- function() {
+  log_dir <- get_sensehub_log_dir()
+  if (is.null(log_dir)) return(NULL)
+  fname <- paste0("sensehub_", format(Sys.time(), "%Y-%m-%d"), ".log")
+  file.path(log_dir, fname)
+}
 
 #' Initialise the application logger
 #' Call once at startup in global.R
@@ -46,6 +80,16 @@ app_log <- function(level = "info", msg, data = NULL) {
 
   # Use message() for Shiny-compatible logging (goes to stderr → captured by deployment platforms)
   message(json_line)
+
+  # Append to date-named log file when possible (for support / troubleshooting)
+  log_dir <- get_sensehub_log_dir()
+  if (!is.null(log_dir)) {
+    fpath <- file.path(log_dir, paste0("sensehub_", format(Sys.time(), "%Y-%m-%d"), ".log"))
+    tryCatch(
+      cat(json_line, "\n", file = fpath, append = TRUE),
+      error = function(e) NULL
+    )
+  }
 }
 
 

@@ -30,22 +30,24 @@ The app needs a set of R packages. You only do this **once** per machine (or aft
    ```
 4. Press **Enter**.
 
-Wait until it finishes (it can take a few minutes). When it’s done you’ll see something like “Done.” and the `>` prompt again. If you get errors about missing packages, ask your colleague or see [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md).
+Wait until it finishes (it can take a few minutes). When it’s done you’ll see something like “Done.” and the `>` prompt again. If you get errors, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md) or [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md).
 
 ---
 
 ## Step 3: Start the app
 
-1. In the **Console** (same bottom pane), type:
+1. In the **Console** (same bottom pane), type (recommended — validates first, then runs):
    ```r
-   source("run_app.R")
+   source("launch_sensehub.R")
    ```
+   Or to skip validation: `source("run_app.R")`
 2. Press **Enter**.
 
 **What happens:**
 
 - In the Console you’ll see lines like:
-  - `Run app: starting...`
+  - `Sensehub launcher: validating...`
+  - `Validation passed. Starting app...`
   - `Launching Sensehub AutoM/L (Shiny app)...`
   - `Listening on http://127.0.0.1:3840`
 - A browser window (or the RStudio Viewer) will open with the app. The address will be something like **http://127.0.0.1:3840**.
@@ -79,4 +81,4 @@ That’s it — the app is running. Use it in the browser (Upload data → Confi
 
 ---
 
-**Quick recap:** Open project → `source("install_packages.R")` once → `source("run_app.R")` to start. Stop with Ctrl+C (or Stop) in the Console.
+**Quick recap:** Open project → `source("install_packages.R")` once → `source("launch_sensehub.R")` to start. Stop with Ctrl+C (or Stop) in the Console. If something breaks, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).

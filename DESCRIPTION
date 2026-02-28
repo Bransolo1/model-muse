@@ -1,0 +1,12 @@
+Package: sensehub
+Title: Sensehub AutoM/L Shiny App
+Version: 0.1.0
+Authors@R: person("Sensehub", role = c("aut", "cre"))
+Description: Run the Sensehub AutoM/L Shiny wizard (tidymodels-based AutoML).
+    Open the project in RStudio, then run sensehub::run_app() after
+    devtools::load_all(".") or install from GitHub. See README and
+    START_APP.md for setup.
+License: MIT
+URL: https://github.com/Bransolo1/model-muse
+BugReports: https://github.com/Bransolo1/model-muse/issues
+Depends: R (>= 4.2.0)

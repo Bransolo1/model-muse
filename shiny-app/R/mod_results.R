@@ -383,6 +383,9 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
         rv$run_status <- "error"
         rv$run_log <- c(rv$run_log, paste("\u2717", validation$message))
         session$sendCustomMessage("stopTimer", list())
+        msg <- paste0("\u2717 ", validation$message)
+        if (!is.null(get_log_file_path())) msg <- paste0(msg, " See TROUBLESHOOTING.md for log file location.")
+        showNotification(msg, type = "error", duration = 8)
         return()
       }
       rv$run_log <- c(rv$run_log, validation$warnings, "Validation passed \u2713")
@@ -405,7 +408,11 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
         rv$run_status <- "error"
         rv$run_log    <- c(rv$run_log, paste("\u2717 Error:", err$message))
         session$sendCustomMessage("stopTimer", list())
-        showNotification(paste("\u2717 Training failed:", err$message), type = "error", duration = 10)
+        log_error("Training failed", error = err, context = list(run_id = current_run_id))
+        log_path <- get_log_file_path()
+        msg <- paste0("\u2717 Training failed: ", err$message)
+        if (!is.null(log_path)) msg <- paste0(msg, " See log file for details (TROUBLESHOOTING.md).")
+        showNotification(msg, type = "error", duration = 10)
       })
     })
 

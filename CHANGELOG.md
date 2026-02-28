@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Usability for colleagues:** TROUBLESHOOTING.md (app won’t start, packages missing, training/export fails, log file location). File-based logging: logs written to a date-named file in the Sensehub log dir (Windows: `%LOCALAPPDATA%\\Sensehub\\logs\\`; macOS/Linux: see TROUBLESHOOTING.md). `launch_sensehub.R` — one script to validate then run the app. `launch_sensehub.bat` — Windows double-click launcher (no RStudio). Minimal R package: DESCRIPTION, NAMESPACE, `R/run_app.R`; `sensehub::run_app()` from project root (after `devtools::load_all(".")`). In-app error display: training and validation failures show a notification and point to the log file / TROUBLESHOOTING when file logging is available.
 - `app_config()` helper in `shiny-app/R/config.R` to read config from `options(sensehub.config)`; `rate_limit_secs` added to app config (env: `SENSEHUB_RATE_LIMIT_SECS`, default 15).
 - RUN_FROM_RSTUDIO: “What you’ll see” and troubleshooting (setwd / `SENSEHUB_PROJECT_DIR`).
 - Dark mode toggle on the React landing page (ThemeProvider + Navbar toggle).

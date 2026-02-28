@@ -5,13 +5,14 @@
 The app runs from **RStudio** on your machine — no servers, no Docker, no Node.js for the main app. **The app runs only on your machine; your data is not sent to any external server.** Requires R 4.2+.
 
 - **New to RStudio?** Follow **[START_APP.md](START_APP.md)** (open project → install packages once → run one line → app opens in browser).
-- **Already use RStudio?** Open the project, run `source("install_packages.R")` once, then `source("run_app.R")`. See [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) for details.
+- **Already use RStudio?** Open the project, run `source("install_packages.R")` once, then **`source("launch_sensehub.R")`** (validates then runs) or `source("run_app.R")`.
+- **Something broke?** See **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** (log file location, what to share when reporting). See [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) for details.
 
 ## Run from RStudio
 
 1. **Open this project in RStudio** (File → Open Project → choose this folder, or use the `SensehubAutoML.Rproj` file).
 2. **Install R packages** once (see [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) or run `source("install_packages.R")`).
-3. **Run the app:** in the Console run `source("run_app.R")`, or open `run_app.R` and Source it (`Ctrl+Shift+S` / `Cmd+Shift+S`).
+3. **Run the app:** in the Console run **`source("launch_sensehub.R")`** (validates then runs) or `source("run_app.R")`. Or open `launch_sensehub.R` and Source it (`Ctrl+Shift+S` / `Cmd+Shift+S`).
 
 The Shiny AutoML wizard will open in your browser. Full instructions: **[RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md)**. One-page overview: **[docs/CHEATSHEET.md](docs/CHEATSHEET.md)**.
 

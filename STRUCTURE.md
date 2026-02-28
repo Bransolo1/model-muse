@@ -4,9 +4,13 @@ Repo: [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse)
 
 ## Root
 
+- `launch_sensehub.R` — **Recommended:** validate then run (one script)
 - `run_app.R` — Entry point to run the Shiny app from RStudio
+- `launch_sensehub.bat` — Windows: double-click to validate and start (no RStudio)
 - `install_packages.R` — Install all R dependencies
 - `validate_r_app.R` — Validate R setup and packages
+- `TROUBLESHOOTING.md` — When things go wrong (log file location, reporting)
+- `DESCRIPTION`, `NAMESPACE`, `R/run_app.R` — Minimal R package; `sensehub::run_app()` from project root
 - `package.json` — Vite + React (optional landing page)
 - `SensehubAutoML.Rproj` — RStudio project file
 - `README.md`, `RUN_FROM_RSTUDIO.md`, `START_APP.md`, `UAT.md`, `CHECKLIST.md`, `DEPENDENCIES.md`, `STRUCTURE.md`
@@ -44,5 +48,7 @@ Repo: [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse)
 
 ## Commands
 
+- **Shiny (recommended):** `source("launch_sensehub.R")` — validates then runs
 - **Shiny:** `source("run_app.R")` from project root in RStudio
+- **Package:** `devtools::load_all("."); sensehub::run_app()` from project root
 - **React:** `npm install && npm run dev` (optional)

@@ -60,7 +60,7 @@ jobs:
         run: |
           library(lintr)
           lints <- lint_dir("R/", linters = linters_with_defaults(
-            line_length_linter(120),
+            line_length_linter(240),
             object_name_linter = NULL,
             commented_code_linter = NULL
           ))

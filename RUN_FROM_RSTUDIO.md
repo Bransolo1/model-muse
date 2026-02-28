@@ -6,7 +6,7 @@ You can run **Sensehub AutoM/L** entirely from RStudio. Colleagues only need:
 - **RStudio**
 - This codebase (e.g. clone of the repo or a copy of the project folder)
 
-No Node.js or command line is required for the main app.
+No Node.js or command line is required for the main app. The app’s look and feel (colours, typography, controls) is aligned with the Sensehub landing page at [auto-model-buddy.lovable.app](https://auto-model-buddy.lovable.app/).
 
 **In a corporate environment with strict IT?** See **[docs/DELIVERY_NO_IT.md](docs/DELIVERY_NO_IT.md)** for how to deliver and run this without new infrastructure or tickets.
 
@@ -65,19 +65,13 @@ You must have the **full** project, including the **`shiny-app`** folder with:
 - `server.R`, `ui.R`, `global.R`
 - `shiny-app/R/` (all R helper and module files)
 
-If you only have part of the repo and get an error when running `run_app.R`, clone the full repository (in a terminal or Git Bash):
-
-```bash
-git clone https://github.com/Bransolo1/model-muse.git
-```
-
-Then open the cloned folder in RStudio (**File → Open Project** → choose the cloned folder) and run `source("run_app.R")` from the Console.
+If you only have part of the repo and get an error when running `run_app.R`, get the full project via RStudio: **File → New Project → Version Control → Git**, paste the repository URL `https://github.com/Bransolo1/model-muse`, choose a folder, and click Create. Then run `source("run_app.R")` in the Console.
 
 ---
 
 ## 5. React landing page (optional)
 
-The **React** site in the project root (`src/`, `package.json`, etc.) is a separate marketing/landing front end. To build or run it you need **Node.js** and:
+The **React** site in the project root (`src/`, `package.json`, etc.) is a separate marketing/landing front end. To build or run it you need **Node.js** and a terminal (e.g. RStudio’s Terminal pane or a system terminal):
 
 ```bash
 npm install

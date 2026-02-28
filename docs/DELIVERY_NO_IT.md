@@ -16,7 +16,7 @@
 ## How colleagues run the app
 
 1. **Get the project** — They receive the project folder (see “How to deliver” below).
-2. **Open in RStudio** — File → Open Project → select the folder (or double‑click the `.Rproj` file).
+2. **Open in RStudio** — File → Open Project → select the folder (or double‑click the `SensehubAutoML.Rproj` file).
 3. **Install packages once** — They run the `install.packages(...)` block from [RUN_FROM_RSTUDIO.md](../RUN_FROM_RSTUDIO.md) in the R console. All from CRAN; no internal repos required unless your company mandates one.
 4. **Run one script** — Open `run_app.R` and **Source** it (e.g. Ctrl+Shift+S). The Shiny app opens in their browser (localhost). No URL to register with IT; it’s a local process.
 
@@ -32,7 +32,7 @@ Pick one that fits your environment:
 |--------|-------------|
 | **ZIP of the repo** | Email or shared drive. They unzip, open the folder in RStudio. Easiest; no git. |
 | **Shared drive / network folder** | Copy the full project folder to a path colleagues can read. They open that folder as the RStudio project. |
-| **Git clone (if git is allowed)** | `git clone <repo>` then open the cloned folder in RStudio. Good for updates. |
+| **Git via RStudio (if git is allowed)** | File → New Project → Version Control → Git, paste repo URL. Good for updates. |
 | **Internal Git (GitLab, Azure Repos, etc.)** | Same as above; use your corporate git URL. No public GitHub needed. |
 
 **Important:** They must get the **full** project, including the **`shiny-app`** folder with `server.R`, `ui.R`, `global.R`, and everything under `shiny-app/R/`. If any of that is missing, `run_app.R` will stop with a clear message.

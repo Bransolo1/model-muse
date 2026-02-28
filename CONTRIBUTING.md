@@ -1,4 +1,4 @@
-# Contributing to Sensehub AutoM/L (model-muse)
+# Contributing to Sensehub AutoM/L
 
 Thanks for your interest in contributing. This project has two main parts: the **Shiny AutoML app** (what colleagues run) and an optional **React landing page** (marketing/docs).
 

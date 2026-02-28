@@ -9,7 +9,7 @@ library(testthat)
 source("R/config.R")
 source("R/utils_logging.R")
 source("R/utils_validation.R")
-source("R/fn_modeling.R")
+source("R/modeling.R")
 
 # Init config for tests
 options(sensehub.config = list(

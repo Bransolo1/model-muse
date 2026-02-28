@@ -76,8 +76,8 @@ library(jsonlite)
 })
 
 # ---- Source modules & helpers ----
-source("R/fn_modeling.R",    local = FALSE)
-source("R/fn_export.R",     local = FALSE)
+source("R/modeling.R",      local = FALSE)
+source("R/export.R",        local = FALSE)
 source("R/mod_upload.R",    local = FALSE)
 source("R/mod_configure.R", local = FALSE)
 source("R/mod_advanced.R",  local = FALSE)

@@ -1,20 +1,6 @@
-# Premium Improvement Opportunities
+# Improvement Opportunities
 
 Suggestions to make Sensehub AutoM/L feel more premium while staying on-brand and avoiding impact on stability or load time.
-
----
-
-## Implemented (Current Session)
-
-- **Visualizations**: All charts now use brand palette (primary `#ff8c00`, `#ff6600`, `#e67e00`, semantic colors for drift/success/danger).
-- **theme_sensehub**: Text colors aligned to design tokens (`#1a1a1a`, `#555`, `#999`).
-- **Categorical target bar**: Switched from blue to primary orange.
-- **ROC/PR/Gain/Lift curves**: Brand color scale applied via `scale_color_manual`.
-- **Residuals loess line**: Changed from blue to primary-dark (`#e67e00`).
-- **CV folds palette**: Reordered to lead with brand orange shades.
-- **Plot containers**: Subtle border-radius and shadow on `.shiny-plot-output`.
-- **DataTables**: Pagination current/hover states use primary; info text uses muted.
-- **Tooltips**: Subtle primary accent border on `.sh-tooltip`.
 
 ---
 
@@ -66,4 +52,4 @@ Suggestions to make Sensehub AutoM/L feel more premium while staying on-brand an
 - **Background**: `#f8f6f3`, surface: `#ffffff`
 - **Text**: `#1a1a1a`, `#555`, `#999`
 - **Sidebar**: `#0f1117`
-- **Success / Warning / Danger**: `#10b981`, `#f59e0b`, `#ef4444`.
+- **Success / Warning / Danger**: `#10b981`, `#f59e0b`, `#ef4444`

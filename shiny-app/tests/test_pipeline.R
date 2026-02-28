@@ -4,8 +4,8 @@
 # ============================================================================
 
 library(testthat)
-source("R/fn_modeling.R")
-source("R/fn_export.R")
+source("R/modeling.R")
+source("R/export.R")
 
 # ---- Helper: create test data ----
 make_clf_data <- function(n = 200) {

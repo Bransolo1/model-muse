@@ -1,5 +1,5 @@
 # ============================================================================
-# fn_export.R — Export functions
+# export.R — Export functions
 # ============================================================================
 
 #' Export a reproducibility bundle as a zip file

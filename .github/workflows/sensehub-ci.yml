@@ -49,7 +49,7 @@ jobs:
               "tidymodels", "recipes", "parsnip", "workflows", "workflowsets",
               "tune", "rsample", "yardstick", "dials", "stacks", "probably",
               "glmnet", "ranger", "xgboost", "kknn", "kernlab", "discrim", "naivebayes", "rpart",
-              "promises", "future",
+              "promises", "future", "parallelly",
               "dplyr", "tidyr", "purrr", "readr", "forcats", "readxl", "lubridate",
               "ggplot2", "jsonlite", "tibble", "rlang", "vip", "themis"
             ))
@@ -76,8 +76,8 @@ jobs:
           source("R/config.R")
           source("R/utils_logging.R")
           source("R/utils_validation.R")
-          source("R/fn_modeling.R")
-          source("R/fn_export.R")
+          source("R/modeling.R")
+          source("R/export.R")
           results <- test_dir("tests/", reporter = "summary")
           if (any(as.data.frame(results)$failed > 0)) {
             stop("Tests failed!")

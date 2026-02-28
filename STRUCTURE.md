@@ -1,39 +1,48 @@
-# Sensehub AutoM/L – folder structure reference
+# Sensehub AutoM/L — Project Structure
 
-Repo: [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse). This file is for AI/tooling to refer to the repo layout.
+Repo: [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse)
 
 ## Root
 
-- `package.json` – Vite + React + shadcn (TypeScript)
-- `vite.config.ts`, `tsconfig*.json`, `tailwind.config.ts`, `postcss.config.js`, `eslint.config.js`, `vitest.config.ts`, `components.json`
-- `index.html` – Vite entry
-- `.gitignore`, `README.md`
-- `bun.lockb` / `package-lock.json` – lockfiles (use npm)
+- `run_app.R` — Entry point to run the Shiny app from RStudio
+- `install_packages.R` — Install all R dependencies
+- `validate_r_app.R` — Validate R setup and packages
+- `package.json` — Vite + React (optional landing page)
+- `SensehubAutoML.Rproj` — RStudio project file
+- `README.md`, `RUN_FROM_RSTUDIO.md`, `DEPENDENCIES.md`, `STRUCTURE.md`
 
-## Frontend (`src/`)
+## Shiny App (`shiny-app/`)
 
-- `main.tsx` – React root
-- `App.tsx` – Router, QueryClient, Toaster, Sonner, TooltipProvider
-- `index.css`, `App.css` – Tailwind + CSS variables
-- `vite-env.d.ts`
-- **`src/pages/`** – `Index.tsx`, `NotFound.tsx`
-- **`src/components/`** – `Navbar.tsx`, `NavLink.tsx`, `HeroOrb.tsx`, `FeatureCard.tsx`, `StepCard.tsx`, `FileTree.tsx`, `PipelineDiagram.tsx`, `Testimonials.tsx`
-- **`src/components/ui/`** – shadcn components (e.g. `button`, `card`, `badge`, `toast`, `toaster`, `tooltip`, `sonner`, …)
-- **`src/lib/`** – `utils.ts` (cn)
-- **`src/hooks/`** – `use-toast.ts`
-- **`src/test/`** – `setup.ts`
+- `server.R`, `ui.R`, `global.R` — Core Shiny files
+- **`R/`** — App logic:
+  - `config.R` — Environment/config
+  - `utils_logging.R`, `utils_validation.R` — Utilities
+  - `modeling.R` — Core pipeline (parse, train, evaluate)
+  - `export.R` — Export bundle
+  - `mod_upload.R`, `mod_configure.R`, `mod_advanced.R`, `mod_results.R` — Shiny modules
+- `tests/` — testthat tests
+- `Dockerfile`, `.env.example`, `.dockerignore`
 
-## R / Shiny
+## React Frontend (`src/`) — Optional
 
-- **`R/`** – Shared R: `config.R`, `utils_logging.R`
-- **`shiny-app/`** – Full Shiny app: `server.R`, `ui.R`, `global.R`, `R/` (config, modules, utils), `tests/`, `Dockerfile`, `.env.example`, etc.
+- `main.tsx`, `App.tsx` — React root
+- `pages/` — Index, NotFound
+- `components/` — Navbar, HeroOrb, FeatureCard, etc.
+- `components/ui/` — shadcn components
+- `lib/`, `hooks/` — Utils, toast
 
-## CI & static
+## Docs (`docs/`)
 
-- **`.github/workflows/`** – `sensehub-ci.yml` (R lint + tests for `shiny-app/`)
-- **`public/`** – `favicon.ico`, `placeholder.svg`, `robots.txt`
+- `DELIVERY_NO_IT.md` — Corporate delivery without IT
+- `CHEATSHEET.md` — Quick reference
+- `IMPROVEMENTS.md` — Future improvement ideas
+
+## CI & Static
+
+- `.github/workflows/` — sensehub-ci.yml (R), react-ci.yml (React)
+- `public/` — favicon, robots.txt
 
 ## Commands
 
-- `npm i` then `npm run dev` – frontend
-- Shiny: from project root, `source("run_app.R")` in R or RStudio (see RUN_FROM_RSTUDIO.md)
+- **Shiny:** `source("run_app.R")` from project root in RStudio
+- **React:** `npm install && npm run dev` (optional)

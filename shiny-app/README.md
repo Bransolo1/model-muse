@@ -19,8 +19,8 @@ shiny-app/
 │   ├── config.R                # Centralised config from env vars with fail-fast
 │   ├── utils_logging.R         # Structured JSON logging (scrubs secrets)
 │   ├── utils_validation.R      # Upload validation, rate limiting, input sanitisation
-│   ├── fn_modeling.R           # Core ML pipeline (parse, validate, preprocess, train)
-│   ├── fn_export.R             # Reproducibility bundle export (zip)
+│   ├── modeling.R              # Core ML pipeline (parse, validate, preprocess, train)
+│   ├── export.R                # Reproducibility bundle export (zip)
 │   ├── mod_upload.R            # Step 1: Upload with file validation & rate limiting
 │   ├── mod_configure.R         # Step 2: Target, predictors, problem type, metric
 │   ├── mod_advanced.R          # Step 3: Tuning budget, CV, imbalance, ensemble

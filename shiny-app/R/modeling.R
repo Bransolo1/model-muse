@@ -1,6 +1,6 @@
 # ============================================================================
-# fn_modeling.R — Core modelling pipeline
-# All testable functions: parse, validate, preprocess, resample, train, etc.
+# modeling.R — Core modelling pipeline
+# Parse, validate, preprocess, resample, train, and evaluate models.
 # ============================================================================
 
 # ---- detect_delimiter() ----

@@ -36,11 +36,11 @@ npm run build   # production build
 
 ## Structure
 
-- **`run_app.R`** – Single entry point to run the Shiny app from RStudio.
-- **`shiny-app/`** – R Shiny AutoML wizard (tidymodels). Must be present (clone full repo if missing).
-- **`R/`** – Shared R utilities.
-- **`src/`** – Optional Vite + React frontend (shadcn, Tailwind).
-- **`.github/workflows/`** – CI (e.g. sensehub-ci).
+- **`run_app.R`** — Entry point to run the Shiny app from RStudio.
+- **`shiny-app/`** — R Shiny AutoML wizard (tidymodels). Must be present (clone full repo if missing).
+- **`src/`** — Optional Vite + React frontend (shadcn, Tailwind).
+- **`docs/`** — Delivery guide, cheatsheet, improvements.
+- **`.github/workflows/`** — CI (sensehub-ci, react-ci).
 
 ## Tech
 

@@ -40,4 +40,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Landing page: premium styling, skip link, ErrorBoundary, CopyCodeButton for code blocks, reduced-motion support, accessibility improvements.
 - run_app.R: host set to 127.0.0.1 for localhost-only binding; setwd/on.exit and package checks in place.
-- Docs: RUN_FROM_RSTUDIO.md, DELIVERY_NO_IT.md, VERIFICATION.md, IMPROVEMENT_ROADMAP.md, NON_TECHNICAL_STAKEHOLDER_UX.md.
+- Docs: RUN_FROM_RSTUDIO.md, DELIVERY_NO_IT.md, CHEATSHEET.md, IMPROVEMENTS.md.

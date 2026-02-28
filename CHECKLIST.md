@@ -15,4 +15,4 @@ Use this when giving the project to a colleague.
 
 **Requires:** R 4.2+ and RStudio.
 
-Full instructions: **RUN_FROM_RSTUDIO.md**. No-IT delivery: **docs/DELIVERY_NO_IT.md**.
+Full instructions: **RUN_FROM_RSTUDIO.md**.

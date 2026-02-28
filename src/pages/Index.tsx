@@ -188,7 +188,7 @@ const Index = () => {
               </p>
             </div>
             <p className="text-center text-sm text-muted-foreground">
-              Full instructions: <strong>RUN_FROM_RSTUDIO.md</strong>. Corporate IT constraints? See <strong>docs/DELIVERY_NO_IT.md</strong>.
+              Full instructions in <strong>RUN_FROM_RSTUDIO.md</strong>.
             </p>
             <p className="text-center text-sm text-muted-foreground">
               Not running the app yourself? Someone on your team can open the project and run it; the four steps above are what you&apos;ll see inside — upload data, choose what to predict, optional settings, then results.

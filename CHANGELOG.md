@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - SEO meta description and Open Graph tags in `index.html`.
 - Favicon (`public/favicon.svg`) for the landing page.
 - Lazy loading for below-the-fold components (PipelineDiagram, Testimonials, FileTree) on the landing page.
-- Pre-handoff checklist in docs/DELIVERY_NO_IT.md and CHECKLIST.md.
+- Pre-handoff checklist in RUN_FROM_RSTUDIO.md (§6) and CHECKLIST.md.
 - CONTRIBUTING.md (how to run Shiny vs React, code style, PR notes).
 - CHANGELOG.md (this file).
 - GitHub Actions workflow for React (lint, test, build) in `.github/workflows/react-ci.yml`.
@@ -40,4 +40,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Landing page: premium styling, skip link, ErrorBoundary, CopyCodeButton for code blocks, reduced-motion support, accessibility improvements.
 - run_app.R: host set to 127.0.0.1 for localhost-only binding; setwd/on.exit and package checks in place.
-- Docs: RUN_FROM_RSTUDIO.md, DELIVERY_NO_IT.md, CHEATSHEET.md, IMPROVEMENTS.md.
+- Docs: RUN_FROM_RSTUDIO.md, CHEATSHEET.md, IMPROVEMENTS.md, CHECKLIST.md.

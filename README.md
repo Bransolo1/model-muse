@@ -2,11 +2,9 @@
 
 **Quick start:** [Run from RStudio](RUN_FROM_RSTUDIO.md)
 
-Runnable from **RStudio** so colleagues can use the app by opening this codebase (no Node required for the main app). **Requires R 4.2+**.
+The app runs from **RStudio** on your machine — no servers, no Docker, no Node.js for the main app. Open the project, install R packages once, and run `source("run_app.R")`. **Requires R 4.2+**.
 
-**Corporate / strict IT?** See **[docs/DELIVERY_NO_IT.md](docs/DELIVERY_NO_IT.md)** for delivering and running the app without new servers or IT tickets (RStudio-only, no Docker).
-
-## Run from RStudio (recommended for colleagues)
+## Run from RStudio
 
 1. **Open this project in RStudio** (File → Open Project → choose this folder, or use the `SensehubAutoML.Rproj` file).
 2. **Install R packages** once (see [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) for the list).

@@ -6,7 +6,7 @@ Thanks for your interest in contributing. This project has two main parts: the *
 
 - **Main app:** R Shiny wizard in `shiny-app/`. Colleagues run it from RStudio via `run_app.R`. This is the primary product.
 - **Landing page:** Vite + React in `src/`. Optional; used for marketing and the “Quick Start” instructions. Requires Node.js to develop or build.
-- **Docs:** `README.md`, `RUN_FROM_RSTUDIO.md`, `docs/` (e.g. DELIVERY_NO_IT.md, IMPROVEMENTS.md).
+- **Docs:** `README.md`, `RUN_FROM_RSTUDIO.md`, `docs/` (e.g. CHEATSHEET.md, IMPROVEMENTS.md), `CHECKLIST.md`.
 
 ## Running the Shiny app
 
@@ -42,7 +42,7 @@ Then open the URL shown (e.g. http://localhost:5173).
 ## Docs
 
 - New user-facing steps or run instructions → update README and/or RUN_FROM_RSTUDIO.md (and the landing Quick Start if it’s copy-paste R code).
-- Corporate/no-IT delivery → docs/DELIVERY_NO_IT.md and CHECKLIST.md.
+- Sharing the project / handoff → RUN_FROM_RSTUDIO.md (§6) and CHECKLIST.md.
 - Improvement ideas → docs/IMPROVEMENTS.md.
 
 If you’re unsure where to put something, open an issue or ask in a PR.

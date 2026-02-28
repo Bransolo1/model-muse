@@ -33,7 +33,7 @@ Repo: [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse)
 
 ## Docs (`docs/`)
 
-- `DELIVERY_NO_IT.md` — Corporate delivery without IT
+- (Sharing/handoff is in RUN_FROM_RSTUDIO.md §6 and CHECKLIST.md)
 - `CHEATSHEET.md` — Quick reference
 - `IMPROVEMENTS.md` — Future improvement ideas
 

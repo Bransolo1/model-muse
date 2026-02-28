@@ -26,4 +26,4 @@
 
 **To run the app:** Open the project in RStudio, install packages once (see RUN_FROM_RSTUDIO.md), then run `source("run_app.R")` or Source `run_app.R`.
 
-**Quick reference:** RUN_FROM_RSTUDIO.md · CHECKLIST.md · docs/DELIVERY_NO_IT.md
+**Quick reference:** RUN_FROM_RSTUDIO.md · CHECKLIST.md

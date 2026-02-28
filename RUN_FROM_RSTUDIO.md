@@ -1,14 +1,12 @@
 # Running the app from RStudio
 
-You can run **Sensehub AutoM/L** entirely from RStudio. Colleagues only need:
+**Sensehub AutoM/L** runs locally from RStudio. No servers, no Docker — just:
 
 - **R** (4.2+)
 - **RStudio**
-- This codebase (e.g. clone of the repo or a copy of the project folder)
+- This project (clone or copy of the folder)
 
-No Node.js or command line is required for the main app. The app’s look and feel (colours, typography, controls) is aligned with the Sensehub landing page at [auto-model-buddy.lovable.app](https://auto-model-buddy.lovable.app/).
-
-**In a corporate environment with strict IT?** See **[docs/DELIVERY_NO_IT.md](docs/DELIVERY_NO_IT.md)** for how to deliver and run this without new infrastructure or tickets.
+No Node.js or command line needed for the app. It opens in your browser on your machine. The UI is aligned with the Sensehub landing at [auto-model-buddy.lovable.app](https://auto-model-buddy.lovable.app/).
 
 ---
 
@@ -85,3 +83,19 @@ npm run dev
 ```
 
 Colleagues who only need the **AutoML wizard** can ignore the React app and run everything from RStudio using **`run_app.R`** as above.
+
+---
+
+## 6. Sharing with colleagues
+
+Give them the **full project folder** (must include `run_app.R` and the **`shiny-app`** folder with `server.R`, `ui.R`, `global.R`, and `shiny-app/R/`).
+
+| How to share | Notes |
+|--------------|--------|
+| **ZIP of the repo** | They unzip, open the folder in RStudio. |
+| **Shared drive / network folder** | Copy the full project to a path they can read; they open that folder as the RStudio project. |
+| **Git** | File → New Project → Version Control → Git, paste repo URL. Same for internal Git (GitLab, Azure Repos). |
+
+**Handoff checklist:** See [CHECKLIST.md](CHECKLIST.md). In short: open project in RStudio → install packages once (from this doc) → Source `run_app.R`.
+
+**If someone asks:** The app is “an R Shiny project you run from RStudio like any other script.” It’s not hosted — each user runs it locally; it opens in their browser on their machine. Only R, RStudio, and CRAN packages are needed.

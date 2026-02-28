@@ -9,7 +9,7 @@ Repo: [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse)
 - `validate_r_app.R` — Validate R setup and packages
 - `package.json` — Vite + React (optional landing page)
 - `SensehubAutoML.Rproj` — RStudio project file
-- `README.md`, `RUN_FROM_RSTUDIO.md`, `DEPENDENCIES.md`, `STRUCTURE.md`
+- `README.md`, `RUN_FROM_RSTUDIO.md`, `START_APP.md`, `UAT.md`, `CHECKLIST.md`, `DEPENDENCIES.md`, `STRUCTURE.md`
 
 ## Shiny App (`shiny-app/`)
 

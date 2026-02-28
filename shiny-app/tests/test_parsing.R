@@ -5,11 +5,12 @@
 
 library(testthat)
 
-# Source the modeling helpers (adjust path if running from shiny-app root)
-source("R/config.R")
-source("R/utils_logging.R")
-source("R/utils_validation.R")
-source("R/modeling.R")
+# App root: test_dir() runs with cwd = tests/, so R/ is one level up
+app_root <- if (file.exists("R/config.R")) "." else ".."
+source(file.path(app_root, "R/config.R"))
+source(file.path(app_root, "R/utils_logging.R"))
+source(file.path(app_root, "R/utils_validation.R"))
+source(file.path(app_root, "R/modeling.R"))
 
 # Init config for tests
 options(sensehub.config = list(
@@ -105,6 +106,11 @@ test_that("parse_dataset accepts RDS when SENSEHUB_ALLOW_RDS is TRUE", {
   tmp <- tempfile(fileext = ".rds")
   saveRDS(data.frame(a = 1:20, b = 1:20), tmp)
   Sys.setenv(SENSEHUB_ALLOW_RDS = "TRUE")
+  cfg <- getOption("sensehub.config")
+  if (is.null(cfg)) cfg <- list()
+  cfg$allow_rds_upload <- TRUE
+  options(sensehub.config = cfg)
+  on.exit({ cfg$allow_rds_upload <- FALSE; options(sensehub.config = cfg) }, add = TRUE)
   result <- parse_dataset(tmp, "test.rds")
   expect_equal(ncol(result$data), 2)
   Sys.setenv(SENSEHUB_ALLOW_RDS = "FALSE")

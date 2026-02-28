@@ -3,6 +3,9 @@
 # Parse, validate, preprocess, resample, train, and evaluate models.
 # ============================================================================
 
+# Base R fallback (no rlang dependency for CI / test runs)
+`%||%` <- function(a, b) if (is.null(a) || (length(a) == 1L && is.character(a) && !nzchar(a))) b else a
+
 # ---- detect_delimiter() ----
 # Try comma, tab, semicolon, pipe; pick the one yielding the most columns with stable parsing
 detect_delimiter <- function(file_path) {
@@ -375,16 +378,17 @@ build_resamples <- function(data, config) {
     folds <- rsample::vfold_cv(rsample::training(split), v = config$advanced$cv_folds)
   } else {
     strata <- if (config$problem_type == "classification") target else NULL
-    split  <- rsample::initial_split(model_data, prop = 0.8, strata = strata)
+    # Suppress tidyselect deprecation from rsample (select(strata) → select(all_of(strata)); upstream fix)
+    split  <- suppressWarnings(rsample::initial_split(model_data, prop = 0.8, strata = strata))
 
     v <- config$advanced$cv_folds
     repeats <- config$advanced$cv_repeats
 
     if (repeats > 1) {
-      folds <- rsample::vfold_cv(rsample::training(split), v = v,
-                                  repeats = repeats, strata = strata)
+      folds <- suppressWarnings(rsample::vfold_cv(rsample::training(split), v = v,
+                                  repeats = repeats, strata = strata))
     } else {
-      folds <- rsample::vfold_cv(rsample::training(split), v = v, strata = strata)
+      folds <- suppressWarnings(rsample::vfold_cv(rsample::training(split), v = v, strata = strata))
     }
   }
 

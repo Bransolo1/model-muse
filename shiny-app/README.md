@@ -26,6 +26,7 @@ shiny-app/
 │   ├── mod_advanced.R          # Step 3: Tuning budget, CV, imbalance, ensemble
 │   └── mod_results.R           # Step 4: Training, leaderboard, diagnostics, export
 └── tests/
+    ├── test_parsing.R          # Parsing & schema unit tests
     ├── test_pipeline.R         # ML pipeline unit tests
     └── test_validation.R       # Security & validation unit tests
 ```

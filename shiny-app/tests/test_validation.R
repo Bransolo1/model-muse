@@ -4,9 +4,10 @@
 # ============================================================================
 
 library(testthat)
-source("R/config.R")
-source("R/utils_logging.R")
-source("R/utils_validation.R")
+app_root <- if (file.exists("R/config.R")) "." else ".."
+source(file.path(app_root, "R/config.R"))
+source(file.path(app_root, "R/utils_logging.R"))
+source(file.path(app_root, "R/utils_validation.R"))
 
 # Init config for tests
 options(sensehub.config = list(
@@ -46,7 +47,8 @@ test_that("validate_upload accepts valid CSV", {
 
 test_that("validate_upload accepts valid Excel extension", {
   tmp <- tempfile(fileext = ".xlsx")
-  writeLines("dummy", tmp)
+  # Magic-byte check expects xlsx to start with ZIP signature (PK)
+  writeBin(as.raw(c(0x50, 0x4B, 0x03, 0x04, 0x00, 0x00, 0x00, 0x00)), tmp)
   result <- validate_upload(tmp, "data.xlsx")
   expect_true(result$ok)
   unlink(tmp)

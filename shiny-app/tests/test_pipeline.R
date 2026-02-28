@@ -4,8 +4,9 @@
 # ============================================================================
 
 library(testthat)
-source("R/modeling.R")
-source("R/export.R")
+app_root <- if (file.exists("R/config.R")) "." else ".."
+source(file.path(app_root, "R/modeling.R"))
+source(file.path(app_root, "R/export.R"))
 
 # ---- Helper: create test data ----
 make_clf_data <- function(n = 200) {

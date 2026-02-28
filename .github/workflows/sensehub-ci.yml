@@ -80,7 +80,8 @@ jobs:
           source("R/modeling.R")
           source("R/export.R")
           results <- test_dir("tests/", reporter = "summary")
-          if (any(as.data.frame(results)$failed > 0)) {
-            stop("Tests failed!")
-          }
+          n_failed <- sum(sapply(results, function(x) {
+            sum(sapply(x$results, function(e) inherits(e, "expectation_failure")))
+          }))
+          if (n_failed > 0) stop("Tests failed!")
         shell: Rscript {0}

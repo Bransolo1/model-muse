@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Sensehub AutoM/L (model-muse) project are documented here.
+All notable changes to the Sensehub AutoM/L project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- `app_config()` helper in `shiny-app/R/config.R` to read config from `options(sensehub.config)`; `rate_limit_secs` added to app config (env: `RATE_LIMIT_SECS`, default 15).
+- RUN_FROM_RSTUDIO: “What you’ll see” and troubleshooting (setwd / `SENSEHUB_PROJECT_DIR`).
 - Dark mode toggle on the React landing page (ThemeProvider + Navbar toggle).
 - SEO meta description and Open Graph tags in `index.html`.
 - Favicon (`public/favicon.svg`) for the landing page.
@@ -30,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- (None in this release.)
+- **ui.R:** Error sourcing ui.R — fixed unescaped double-quote in tour progress-dots JS (use `String.fromCharCode(34)` for the closing quote).
 
 ---
 

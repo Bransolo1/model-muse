@@ -32,8 +32,8 @@ ui <- page_navbar(
     success    = "#10b981",
     warning    = "#f59e0b",
     danger     = "#ef4444",
-    base_font  = font_google("Inter", local = TRUE),
-    heading_font = font_google("Inter", local = TRUE),
+    base_font  = font_google("Inter"),
+    heading_font = font_google("Inter"),
     font_scale = 0.92,
     "navbar-bg"          = "#ffffff",
     "card-bg"            = "#ffffff",
@@ -1243,22 +1243,22 @@ ui <- page_navbar(
       });
 
       // ---- Dropzone → fileInput bridge ----
-      $(document).on('click', '[id$="dropzone"]', function() {
-        $(this).closest('.card-body').find('input[type="file"]').trigger('click');
+      $(document).on('click', '[id$=\"dropzone\"]', function() {
+        $(this).closest('.card-body').find('input[type=\"file\"]').trigger('click');
       });
       // Drag-and-drop visual feedback
-      $(document).on('dragover', '[id$="dropzone"]', function(e) {
+      $(document).on('dragover', '[id$=\"dropzone\"]', function(e) {
         e.preventDefault();
         $(this).addClass('dragover');
       });
-      $(document).on('dragleave drop', '[id$="dropzone"]', function(e) {
+      $(document).on('dragleave drop', '[id$=\"dropzone\"]', function(e) {
         $(this).removeClass('dragover');
       });
-      $(document).on('drop', '[id$="dropzone"]', function(e) {
+      $(document).on('drop', '[id$=\"dropzone\"]', function(e) {
         e.preventDefault();
         var files = e.originalEvent.dataTransfer.files;
         if (files.length > 0) {
-          var fileInput = $(this).closest('.card-body').find('input[type="file"]')[0];
+          var fileInput = $(this).closest('.card-body').find('input[type=\"file\"]')[0];
           var dt = new DataTransfer();
           dt.items.add(files[0]);
           fileInput.files = dt.files;
@@ -1317,7 +1317,7 @@ ui <- page_navbar(
         function buildProgressDots(total, active) {
           var html = '<div class=\"tour-progress\">';
           for (var i = 0; i < total; i++) {
-            html += '<div class=\"tour-progress-dot' + (i === active ? ' active' : '') + '\"></div>';
+            html += '<div class=\"tour-progress-dot' + (i === active ? ' active' : '') + String.fromCharCode(34) + '></div>';
           }
           html += '</div>';
           return html;

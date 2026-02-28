@@ -1,6 +1,6 @@
-# model-muse – folder structure reference
+# Sensehub AutoM/L – folder structure reference
 
-Local mirror of [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse). This file is for AI/tooling to refer to the repo layout.
+Repo: [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse). This file is for AI/tooling to refer to the repo layout.
 
 ## Root
 
@@ -36,4 +36,4 @@ Local mirror of [Bransolo1/model-muse](https://github.com/Bransolo1/model-muse).
 ## Commands
 
 - `npm i` then `npm run dev` – frontend
-- Shiny: from `shiny-app/`, `R -e "shiny::runApp()"` (after installing R deps)
+- Shiny: from project root, `source("run_app.R")` in R or RStudio (see RUN_FROM_RSTUDIO.md)

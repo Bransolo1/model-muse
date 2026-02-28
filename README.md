@@ -1,6 +1,6 @@
-# Model Muse (Sensehub AutoM/L)
+# Sensehub AutoM/L
 
-[![Run from RStudio](RUN_FROM_RSTUDIO.md)](RUN_FROM_RSTUDIO.md)
+**Quick start:** [Run from RStudio](RUN_FROM_RSTUDIO.md)
 
 Runnable from **RStudio** so colleagues can use the app by opening this codebase (no Node required for the main app). **Requires R 4.2+**.
 
@@ -8,7 +8,7 @@ Runnable from **RStudio** so colleagues can use the app by opening this codebase
 
 ## Run from RStudio (recommended for colleagues)
 
-1. **Open this project in RStudio** (File → Open Project → choose this folder, or use the `.Rproj` file).
+1. **Open this project in RStudio** (File → Open Project → choose this folder, or use the `SensehubAutoML.Rproj` file).
 2. **Install R packages** once (see [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) for the list).
 3. **Run the app:** open `run_app.R` and source it (`Ctrl+Shift+S` / `Cmd+Shift+S`), or run `source("run_app.R")`.
 

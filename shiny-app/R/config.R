@@ -1,37 +1,25 @@
-# Configuration for Shiny Application
+# Configuration for Sensehub AutoM/L Shiny Application
+# Optional: load .env via dotenv if installed; otherwise use Sys.getenv() only.
 
-# Load environment variables from .env file (use dotenv package)
-library(dotenv)
-load_dotenv()
-
-# Default configuration values
-config <- list(
-  port = as.integer(Sys.getenv("PORT", "1234")),
-  host = Sys.getenv("HOST", "0.0.0.0"),
-  debug = as.logical(Sys.getenv("DEBUG", "FALSE")),
-  db_host = Sys.getenv("DB_HOST", "localhost"),
-  db_port = as.integer(Sys.getenv("DB_PORT", "3306")),
-  db_name = Sys.getenv("DB_NAME", "my_database"),
-  db_user = Sys.getenv("DB_USER", "user"),
-  db_password = Sys.getenv("DB_PASSWORD", "password") 
-)
-
-# Validate configuration values
-validate_config <- function(config) {
-  if (is.null(config$host) || config$host == "") {
-    stop("ERROR: HOST must be set.")
-  }
-  if (is.null(config$db_name) || config$db_name == "") {
-    stop("ERROR: DB_NAME must be set.")
-  }
-  if (is.null(config$db_user) || config$db_user == "") {
-    stop("ERROR: DB_USER must be set.")
-  }
-  # Add more validations as necessary
+if (requireNamespace("dotenv", quietly = TRUE)) {
+  tryCatch(dotenv::load_dotenv(), error = function(e) NULL)
 }
 
-# Run validation
-validate_config(config)
+load_app_config <- function() {
+  list(
+    global_seed       = as.integer(Sys.getenv("GLOBAL_SEED", "42")),
+    max_upload_mb     = as.numeric(Sys.getenv("MAX_UPLOAD_MB", "50")),
+    allow_rds_upload  = as.logical(Sys.getenv("ALLOW_RDS_UPLOAD", "FALSE")),
+    max_workers       = as.integer(Sys.getenv("MAX_WORKERS", "2")),
+    rate_limit_secs   = as.numeric(Sys.getenv("RATE_LIMIT_SECS", "15"))
+  )
+}
 
-# Export configuration
-return(config)
+APP_CONFIG <- load_app_config()
+
+#' Read a value from app config (set in global.R via options(sensehub.config = APP_CONFIG))
+app_config <- function(key) {
+  cfg <- getOption("sensehub.config")
+  if (is.null(cfg)) return(NULL)
+  cfg[[key]]
+}

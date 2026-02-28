@@ -14,7 +14,7 @@ No Node.js or command line is required for the main app.
 
 ## 1. Open the project in RStudio
 
-- **File → Open Project…** (or double‑click the `.Rproj` file if present).
+- **File → Open Project…** (or double‑click the `SensehubAutoML.Rproj` file if present).
 - Choose the **project folder** (the one that contains `run_app.R` and the `shiny-app` folder).
 
 ---
@@ -43,14 +43,18 @@ If any fail, install them individually. Optional: `earth` (for MARS models).
 
 In RStudio:
 
-- Open **`run_app.R`** in the editor.
-- **Source** it: `Ctrl+Shift+S` (Windows/Linux) or `Cmd+Shift+S` (Mac), or run:
+1. Open **`run_app.R`** in the editor (or leave it closed).
+2. In the **Console** (bottom pane), run:
 
 ```r
 source("run_app.R")
 ```
 
-The Shiny app will start and open in your browser (or RStudio Viewer).
+Or use **Source** (`Ctrl+Shift+S` / `Cmd+Shift+S`) with `run_app.R` focused.
+
+**What you’ll see:** The Console will print `Run app: starting...`, then `Launching Sensehub AutoM/L (Shiny app)...`, then Shiny’s `Listening on http://127.0.0.1:3840`. The app opens in your browser or RStudio Viewer.
+
+If nothing appears in the Console, set the working directory to the project folder: run `setwd("/path/to/your/Github project")` (use your actual path), then run `source("run_app.R")` again. Alternatively, you can set the environment variable `SENSEHUB_PROJECT_DIR` to that path so the script can switch to it automatically when needed.
 
 ---
 
@@ -61,13 +65,13 @@ You must have the **full** project, including the **`shiny-app`** folder with:
 - `server.R`, `ui.R`, `global.R`
 - `shiny-app/R/` (all R helper and module files)
 
-If you only have part of the repo and get an error when running `run_app.R`, clone the full repository:
+If you only have part of the repo and get an error when running `run_app.R`, clone the full repository (in a terminal or Git Bash):
 
-```r
-# In R, or in a terminal:
-# git clone https://github.com/Bransolo1/model-muse.git
-# Then open the cloned folder in RStudio and run run_app.R
+```bash
+git clone https://github.com/Bransolo1/model-muse.git
 ```
+
+Then open the cloned folder in RStudio (**File → Open Project** → choose the cloned folder) and run `source("run_app.R")` from the Console.
 
 ---
 

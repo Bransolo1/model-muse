@@ -24,18 +24,24 @@ No Node.js or command line is required for the main app. The app’s look and fe
 The Shiny app uses these packages. Install once:
 
 ```r
+source("install_packages.R")
+```
+
+Or install manually:
+
+```r
 install.packages(c(
   "shiny", "bslib", "DT", "shinyWidgets", "shinyjs",
   "tidymodels", "recipes", "parsnip", "workflows", "workflowsets",
   "tune", "rsample", "yardstick", "dials", "stacks", "probably",
   "glmnet", "ranger", "xgboost", "kknn", "kernlab", "discrim", "naivebayes", "rpart",
-  "promises", "future",
+  "promises", "future", "parallelly",
   "dplyr", "tidyr", "purrr", "readr", "forcats", "readxl", "lubridate",
   "ggplot2", "jsonlite", "vip", "themis"
 ))
 ```
 
-If any fail, install them individually. Optional: `earth` (for MARS models).
+If any fail, install them individually. Optional: `earth` (MARS models), `dotenv` (.env support).
 
 ---
 

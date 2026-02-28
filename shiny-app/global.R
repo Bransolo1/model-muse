@@ -12,15 +12,6 @@ source("R/utils_validation.R", local = FALSE)
 APP_CONFIG <- load_app_config()
 options(sensehub.config = APP_CONFIG)
 
-# ---- rlang version advisory ----
-if (requireNamespace("rlang", quietly = TRUE) &&
-    utils::packageVersion("rlang") > "1.1.6") {
-  message(sprintf(
-    "[WARN] rlang %s detected. This app was tested with rlang <= 1.1.6. If you encounter issues, run: remotes::install_version('rlang', version = '1.1.6')",
-    as.character(utils::packageVersion("rlang"))
-  ))
-}
-
 # ---- Suppress startup messages to speed up launch ----
 suppressPackageStartupMessages({
 

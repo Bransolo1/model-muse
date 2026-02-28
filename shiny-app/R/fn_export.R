@@ -49,12 +49,14 @@ export_bundle <- function(results, config, run_id, zip_path) {
 
   # Split info
   tryCatch({
-    split_info <- list(
-      training_rows = as.integer(rsample::training(results$split) %>% nrow()),
-      testing_rows  = as.integer(rsample::testing(results$split) %>% nrow())
-    )
-    jsonlite::write_json(split_info, file.path(tmpdir, "split_info.json"),
-                         pretty = TRUE, auto_unbox = TRUE)
+    if (!is.null(results$split)) {
+      split_info <- list(
+        training_rows = as.integer(nrow(rsample::training(results$split))),
+        testing_rows  = as.integer(nrow(rsample::testing(results$split)))
+      )
+      jsonlite::write_json(split_info, file.path(tmpdir, "split_info.json"),
+                           pretty = TRUE, auto_unbox = TRUE)
+    }
   }, error = function(e) NULL)
 
   # Seed

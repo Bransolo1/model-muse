@@ -7,11 +7,11 @@ if (requireNamespace("dotenv", quietly = TRUE)) {
 
 load_app_config <- function() {
   list(
-    global_seed       = as.integer(Sys.getenv("GLOBAL_SEED", "42")),
-    max_upload_mb     = as.numeric(Sys.getenv("MAX_UPLOAD_MB", "50")),
-    allow_rds_upload  = as.logical(Sys.getenv("ALLOW_RDS_UPLOAD", "FALSE")),
-    max_workers       = as.integer(Sys.getenv("MAX_WORKERS", "2")),
-    rate_limit_secs   = as.numeric(Sys.getenv("RATE_LIMIT_SECS", "15"))
+    global_seed       = as.integer(Sys.getenv("SENSEHUB_SEED", Sys.getenv("GLOBAL_SEED", "42"))),
+    max_upload_mb     = as.numeric(Sys.getenv("SENSEHUB_MAX_UPLOAD_MB", Sys.getenv("MAX_UPLOAD_MB", "50"))),
+    allow_rds_upload  = as.logical(Sys.getenv("SENSEHUB_ALLOW_RDS", Sys.getenv("ALLOW_RDS_UPLOAD", "FALSE"))),
+    max_workers       = as.integer(Sys.getenv("SENSEHUB_MAX_WORKERS", Sys.getenv("MAX_WORKERS", "2"))),
+    rate_limit_secs   = as.numeric(Sys.getenv("SENSEHUB_RATE_LIMIT_SECS", Sys.getenv("RATE_LIMIT_SECS", "15")))
   )
 }
 

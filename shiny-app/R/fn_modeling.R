@@ -52,9 +52,10 @@ parse_dataset <- function(file_path, file_name = NULL) {
     xlsx = readxl::read_excel(file_path),
     xls  = readxl::read_excel(file_path),
     rds  = {
-      allow_rds <- as.logical(Sys.getenv("SENSEHUB_ALLOW_RDS", "FALSE"))
-      if (!isTRUE(allow_rds)) {
-        stop("RDS uploads are disabled. Set SENSEHUB_ALLOW_RDS=TRUE to enable, or upload as CSV/Excel.",
+      cfg <- getOption("sensehub.config")
+      allow_rds <- isTRUE((cfg %||% list())[["allow_rds_upload"]] %||% FALSE)
+      if (!allow_rds) {
+        stop("RDS uploads are disabled. Set SENSEHUB_ALLOW_RDS=TRUE or enable in config.",
              call. = FALSE)
       }
       readRDS(file_path)

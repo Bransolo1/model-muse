@@ -2,8 +2,12 @@
 # utils_validation.R — Input validation & sanitisation helpers
 # ============================================================================
 
-# Maximum upload size in bytes (100 MB)
-MAX_UPLOAD_BYTES <- 100 * 1024 * 1024
+# Maximum upload size — use config when available, else 100 MB fallback
+get_max_upload_bytes <- function() {
+  cfg <- getOption("sensehub.config")
+  mb <- (cfg %||% list())[["max_upload_mb"]] %||% 50
+  as.numeric(mb) * 1024^2
+}
 
 # Allowed file extensions for dataset upload
 ALLOWED_EXTENSIONS <- c("csv", "tsv", "txt", "xlsx", "xls", "rds")
@@ -31,12 +35,13 @@ validate_upload <- function(file_path, file_name, file_size = NULL) {
                         ext, paste(ALLOWED_EXTENSIONS, collapse = ", "))))
   }
 
-  # Size check (server-side enforcement)
+  # Size check (server-side enforcement, must match config)
   actual_size <- file.info(file_path)$size
-  if (!is.na(actual_size) && actual_size > MAX_UPLOAD_BYTES) {
+  max_bytes <- get_max_upload_bytes()
+  if (!is.na(actual_size) && actual_size > max_bytes) {
     return(list(ok = FALSE,
       message = sprintf("File too large (%.1f MB). Maximum: %.0f MB.",
-                        actual_size / 1024^2, MAX_UPLOAD_BYTES / 1024^2)))
+                        actual_size / 1024^2, max_bytes / 1024^2)))
   }
 
   # RDS safety warning — readRDS can execute arbitrary code

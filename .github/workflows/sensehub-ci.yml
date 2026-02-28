@@ -67,6 +67,7 @@ jobs:
           if (length(lints) > 0) {
             print(lints)
             cat(sprintf("\n⚠ %d lint issues found.\n", length(lints)))
+            quit(status = 1)
           }
         shell: Rscript {0}
 

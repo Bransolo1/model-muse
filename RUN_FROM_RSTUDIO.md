@@ -1,5 +1,7 @@
 # Running the app from RStudio
 
+**Prefer a step-by-step guide?** See **[START_APP.md](START_APP.md)** (open project → install packages once → run one line → stop the app).
+
 **Sensehub AutoM/L** runs locally from RStudio. No servers, no Docker — just:
 
 - **R** (4.2+)

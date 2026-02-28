@@ -2,10 +2,12 @@
 # utils_validation.R — Input validation & sanitisation helpers
 # ============================================================================
 
-# Maximum upload size — use config when available, else 100 MB fallback
+# Maximum upload size — use config when available, else 50 MB fallback (no rlang dependency)
 get_max_upload_bytes <- function() {
   cfg <- getOption("sensehub.config")
-  mb <- (cfg %||% list())[["max_upload_mb"]] %||% 50
+  if (is.null(cfg)) cfg <- list()
+  mb <- cfg[["max_upload_mb"]]
+  if (is.null(mb)) mb <- 50
   as.numeric(mb) * 1024^2
 }
 
@@ -28,7 +30,7 @@ validate_upload <- function(file_path, file_name, file_size = NULL) {
 
   # Extension check
 
-  ext <- tolower(tools::file_ext(file_name %||% file_path))
+  ext <- tolower(tools::file_ext(if (is.null(file_name)) file_path else file_name))
   if (!ext %in% ALLOWED_EXTENSIONS) {
     return(list(ok = FALSE,
       message = sprintf("Unsupported file type: .%s. Allowed: %s",

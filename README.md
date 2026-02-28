@@ -1,16 +1,23 @@
 # Sensehub AutoM/L
 
-**Quick start:** [Run from RStudio](RUN_FROM_RSTUDIO.md)
+**Quick start:** [Run from RStudio](RUN_FROM_RSTUDIO.md) · **Step-by-step:** [START_APP.md](START_APP.md)
 
-The app runs from **RStudio** on your machine — no servers, no Docker, no Node.js for the main app. Open the project, install R packages once, and run `source("run_app.R")`. **Requires R 4.2+**.
+The app runs from **RStudio** on your machine — no servers, no Docker, no Node.js for the main app. **Requires R 4.2+**.
+
+- **New to RStudio?** Follow **[START_APP.md](START_APP.md)** (open project → install packages once → run one line → app opens in browser).
+- **Already use RStudio?** Open the project, run `source("install_packages.R")` once, then `source("run_app.R")`. See [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) for details.
 
 ## Run from RStudio
 
 1. **Open this project in RStudio** (File → Open Project → choose this folder, or use the `SensehubAutoML.Rproj` file).
-2. **Install R packages** once (see [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) for the list).
-3. **Run the app:** open `run_app.R` and source it (`Ctrl+Shift+S` / `Cmd+Shift+S`), or run `source("run_app.R")`.
+2. **Install R packages** once (see [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) or run `source("install_packages.R")`).
+3. **Run the app:** in the Console run `source("run_app.R")`, or open `run_app.R` and Source it (`Ctrl+Shift+S` / `Cmd+Shift+S`).
 
 The Shiny AutoML wizard will open in your browser. Full instructions: **[RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md)**. One-page overview: **[docs/CHEATSHEET.md](docs/CHEATSHEET.md)**.
+
+## UAT and smoke check
+
+Before handoff or UAT: run `source("validate_r_app.R")` then `source("run_app.R")` and follow the **golden path** in **[UAT.md](UAT.md)** (Upload → Configure → Advanced → Run → check Leaderboard and Export). See [UAT.md](UAT.md) for scope and where to report issues.
 
 ## Optional: React landing page
 

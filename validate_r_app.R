@@ -72,14 +72,13 @@ for (p in pkgs_optional) {
   }
 }
 
-# 4. Quick load test (sources global.R which loads everything)
+# 3. Quick load test (source config and utils from shiny-app using paths from project root)
 cat("\n3. Load test\n")
-owd <- setwd("shiny-app")
-on.exit(setwd(owd), add = TRUE)
+shiny_r <- file.path("shiny-app", "R")
 load_ok <- tryCatch({
-  source("R/config.R", local = TRUE)
-  source("R/utils_logging.R", local = TRUE)
-  source("R/utils_validation.R", local = TRUE)
+  source(file.path(shiny_r, "config.R"), local = TRUE)
+  source(file.path(shiny_r, "utils_logging.R"), local = TRUE)
+  source(file.path(shiny_r, "utils_validation.R"), local = TRUE)
   TRUE
 }, error = function(e) {
   cat("   FAIL: Config/utils failed to load:", conditionMessage(e), "\n")

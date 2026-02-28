@@ -2,6 +2,8 @@
 
 You need **R** and **RStudio** installed. If you don’t have them, install R from [r-project.org](https://www.r-project.org/) then RStudio from [posit.co/download](https://posit.co/download/rstudio-desktop/).
 
+The app runs only on your machine; your data is not sent to any external server.
+
 ---
 
 ## Step 1: Open the project in RStudio

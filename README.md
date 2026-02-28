@@ -2,7 +2,7 @@
 
 **Quick start:** [Run from RStudio](RUN_FROM_RSTUDIO.md) · **Step-by-step:** [START_APP.md](START_APP.md)
 
-The app runs from **RStudio** on your machine — no servers, no Docker, no Node.js for the main app. **Requires R 4.2+**.
+The app runs from **RStudio** on your machine — no servers, no Docker, no Node.js for the main app. **The app runs only on your machine; your data is not sent to any external server.** Requires R 4.2+.
 
 - **New to RStudio?** Follow **[START_APP.md](START_APP.md)** (open project → install packages once → run one line → app opens in browser).
 - **Already use RStudio?** Open the project, run `source("install_packages.R")` once, then `source("run_app.R")`. See [RUN_FROM_RSTUDIO.md](RUN_FROM_RSTUDIO.md) for details.
@@ -46,6 +46,10 @@ npm run build   # production build
 - **`src/`** — Optional Vite + React frontend (shadcn, Tailwind).
 - **`docs/`** — Delivery guide, cheatsheet, improvements.
 - **`.github/workflows/`** — CI (sensehub-ci, react-ci).
+
+## Disclaimer
+
+No warranty; use at your own risk. Data stays on your machine. The app does not send your data to any external server.
 
 ## Tech
 

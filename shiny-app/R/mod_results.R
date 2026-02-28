@@ -7,18 +7,18 @@ theme_sensehub <- function(base_size = 13) {
     ggplot2::theme(
       plot.background  = ggplot2::element_rect(fill = "#ffffff", color = NA),
       panel.background = ggplot2::element_rect(fill = "#ffffff", color = NA),
-      text             = ggplot2::element_text(color = "#333", family = "Inter"),
-      axis.text        = ggplot2::element_text(color = "#888"),
+      text             = ggplot2::element_text(color = "#1a1a1a", family = "Inter"),
+      axis.text        = ggplot2::element_text(color = "#555"),
       axis.title       = ggplot2::element_text(color = "#555", face = "plain", size = 11),
       panel.grid.major = ggplot2::element_line(color = "#f0ece6", linewidth = 0.4),
       panel.grid.minor = ggplot2::element_blank(),
       strip.text       = ggplot2::element_text(color = "#ff8c00", face = "bold", size = 12),
       plot.title       = ggplot2::element_text(color = "#1a1a1a", face = "bold",
                                                 size = 15, margin = ggplot2::margin(b = 8)),
-      plot.subtitle    = ggplot2::element_text(color = "#888", size = 11,
+      plot.subtitle    = ggplot2::element_text(color = "#555", size = 11,
                                                 margin = ggplot2::margin(b = 12)),
-      plot.caption     = ggplot2::element_text(color = "#bbb", size = 9),
-      legend.text      = ggplot2::element_text(color = "#666", size = 10),
+      plot.caption     = ggplot2::element_text(color = "#999", size = 9),
+      legend.text      = ggplot2::element_text(color = "#555", size = 10),
       legend.title     = ggplot2::element_text(color = "#555", face = "bold", size = 10),
       plot.margin      = ggplot2::margin(16, 16, 12, 12)
     )
@@ -154,6 +154,17 @@ mod_results_ui <- function(id) {
         ),
 
         nav_panel("Predictions",
+          tags$p(class = "small", style = "color: #999;",
+                 "Distribution of predicted values and the predictions table. Export CSV below for downstream use."),
+          tags$h5("Prediction distribution", style = "color: #ff8c00; font-weight: 700;"),
+          tags$div(
+            class = "d-flex align-items-center gap-2 mb-2",
+            downloadButton(ns("dl_pred_dist_png"), tagList(icon("image"), " Download chart as PNG"),
+                           class = "btn-outline-secondary btn-sm")
+          ),
+          plotOutput(ns("pred_dist_plot"), height = "320px"),
+          tags$hr(style = "border-color: #e8e4de;"),
+          tags$h5("Predictions table", style = "color: #ff8c00; font-weight: 700;"),
           DT::dataTableOutput(ns("predictions_table"))
         ),
 
@@ -175,7 +186,11 @@ mod_results_ui <- function(id) {
                            class = "btn-outline-secondary w-100"),
             downloadButton(ns("dl_fitted_model"), tagList(icon("box"), " Model (.rds)"),
                            class = "btn-outline-secondary w-100")
-          )
+          ),
+          tags$h5("Download charts as PNG", style = "color: #ff8c00; font-weight: 700; margin-top: 1.5rem;"),
+          tags$p(class = "small mb-2", style = "color: #999;",
+                 "Export key charts for reports or presentations."),
+          uiOutput(ns("export_png_buttons"))
         )
       )
     )
@@ -428,32 +443,112 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
 
     output$run_log <- renderText({ paste(rv$run_log, collapse = "\n") })
 
-    # ---- Results overview (stat cards) ----
+    # ---- Results overview: best model first, then one-line why, plain-English summary, CTA ----
     output$results_overview <- renderUI({
       req(rv$results)
       lb <- rv$results$leaderboard
       req(lb, nrow(lb) > 0)
 
-      best_score <- lb$`Metric (mean)`[1]
-      best_model <- lb$`Model name`[1]
-      n_models   <- nrow(lb)
+      best_score   <- lb$`Metric (mean)`[1]
+      best_model   <- lb$`Model name`[1]
+      n_models     <- nrow(lb)
+      metric_lab   <- metric_label(rv$metric)
+      summaries    <- rv$results$model_summaries
+      # One-line reason: "Best model: X — highest ROC AUC (0.94) with stable CV folds."
+      cv_note      <- "with cross-validated performance"
+      if (length(summaries) > 0 && !is.null(summaries[[1]]$metric_se)) {
+        se <- summaries[[1]]$metric_se
+        if (!is.na(se) && (best_score == 0 || abs(se / best_score) < 0.15))
+          cv_note <- "with stable CV folds"
+      }
+      one_line     <- sprintf("Best model: %s \u2014 highest %s (%.4f) %s.",
+                              best_model, metric_lab, best_score, cv_note)
+
+      # Plain-English summary (1\u20133 sentences)
+      preds <- rv$results$predictions
+      target_col <- rv$results$config_target %||% rv$target_col
+      plain_english <- character(0)
+      if (rv$problem_type == "classification" && !is.null(preds) && target_col %in% names(preds)) {
+        plain_english <- c(
+          sprintf("The winning model achieves %s of %.4f.", metric_lab, best_score)
+        )
+        prob_cols <- grep("^\\.pred_", names(preds), value = TRUE)
+        prob_cols <- setdiff(prob_cols, c(".pred_class", ".pred"))
+        if (length(prob_cols) > 0) {
+          truth_vec <- preds[[target_col]]
+          event_level <- levels(truth_vec)[1]
+          event_prob_col <- paste0(".pred_", event_level)
+          if (!event_prob_col %in% names(preds)) event_prob_col <- prob_cols[1]
+          tryCatch({
+            gain_data <- yardstick::gain_curve(preds, truth = !!rlang::sym(target_col),
+                                               !!rlang::sym(event_prob_col))
+            if (!is.null(gain_data) && nrow(gain_data) > 0) {
+              # Approximate cumulative gain at 20% of sample
+              idx <- which(gain_data$.percent_tested <= 0.21)
+              if (length(idx) > 0) {
+                pct <- round(100 * gain_data$.percent_found[max(idx)], 0)
+                plain_english <- c(plain_english,
+                  sprintf("In the top 20%% of scored rows, the model captures %d%% of all positive cases.", pct))
+              }
+            }
+          }, error = function(e) NULL)
+        }
+        if (!is.null(rv$results$calibration_data) && nrow(rv$results$calibration_data) > 0)
+          plain_english <- c(plain_english,
+            "Predicted probabilities are calibrated; see the Confidence tab for the reliability curve.")
+      } else if (rv$problem_type == "regression") {
+        lower_better <- rv$metric %in% c("rmse", "mae", "mape", "mn_log_loss")
+        note <- if (lower_better) " (lower is better)." else " (higher is better for R\u00b2)."
+        plain_english <- c(
+          sprintf("The winning model achieves %s of %.4f%s", metric_lab, best_score, note),
+          "Predictions are centered around actual values; see the Residuals plot in Diagnostics for details."
+        )
+      }
+      if (length(plain_english) == 0)
+        plain_english <- sprintf("The winning model achieves %s of %.4f.", metric_lab, best_score)
 
       tags$div(
-        class = "d-flex gap-3 mt-3 mb-1",
         style = "animation: cardEntrance 0.45s var(--sh-ease) both;",
-        tags$div(class = "stat-card", style = "flex: 1;",
-                 tags$div(class = "stat-value", sprintf("%.4f", best_score)),
-                 tags$div(class = "stat-label", paste("Best", metric_label(rv$metric)))),
-        tags$div(class = "stat-card", style = "flex: 1;",
-                 tags$div(class = "stat-value", style = "font-size: 1rem;", best_model),
-                 tags$div(class = "stat-label", "Best model")),
-        tags$div(class = "stat-card", style = "flex: 1;",
-                 tags$div(class = "stat-value", n_models),
-                 tags$div(class = "stat-label", "Models trained")),
-        tags$div(class = "stat-card", style = "flex: 1;",
-                 tags$div(class = "stat-value",
-                          if (!is.null(rv$results$ensemble)) "\u2713" else "\u2014"),
-                 tags$div(class = "stat-label", "Ensemble"))
+        # Stat cards row
+        tags$div(
+          class = "d-flex gap-3 mt-3 mb-2",
+          tags$div(class = "stat-card", style = "flex: 1;",
+                   tags$div(class = "stat-value", sprintf("%.4f", best_score)),
+                   tags$div(class = "stat-label", paste("Best", metric_lab))),
+          tags$div(class = "stat-card", style = "flex: 1;",
+                   tags$div(class = "stat-value", style = "font-size: 1rem;", best_model),
+                   tags$div(class = "stat-label", "Best model")),
+          tags$div(class = "stat-card", style = "flex: 1;",
+                   tags$div(class = "stat-value", n_models),
+                   tags$div(class = "stat-label", "Models trained")),
+          tags$div(class = "stat-card", style = "flex: 1;",
+                   tags$div(class = "stat-value",
+                            if (!is.null(rv$results$ensemble)) "\u2713" else "\u2014"),
+                   tags$div(class = "stat-label", "Ensemble"))
+        ),
+        # One-line why
+        tags$p(
+          class = "mb-2",
+          style = "font-size: 0.95rem; color: #333; font-weight: 600;",
+          icon("circle-check", style = "color: #10b981; margin-right: 6px;"),
+          one_line
+        ),
+        # Plain-English block
+        tags$div(
+          class = "sh-callout sh-callout-info mb-2",
+          style = "border-left: 3px solid #ff8c00; padding: 10px 14px; background: #fffbf5; border-radius: 0 8px 8px 0;",
+          icon("language", style = "color: #ff8c00; margin-right: 6px;"),
+          tags$div(
+            tags$strong("In plain English", style = "color: #1a1a1a;"),
+            tags$p(class = "mb-0 mt-1", style = "color: #555; font-size: 0.9rem; line-height: 1.5;",
+                   paste(plain_english, collapse = " "))
+          )
+        ),
+        # CTA to Diagnostics / Explain
+        tags$p(
+          class = "small text-muted mb-0",
+          "See the Diagnostics and Explain tabs below for charts and feature importance."
+        )
       )
     })
 
@@ -588,7 +683,9 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
     output$roc_plot <- renderPlot({
       req(rv$results$roc_data)
       roc <- rv$results$roc_data
-      p <- autoplot(roc) + theme_sensehub()
+      brand_pal <- c("#ff8c00", "#ff6600", "#e67e00", "#10b981", "#3b82f6", "#8b5cf6")
+      p <- autoplot(roc) + theme_sensehub() +
+        ggplot2::scale_color_manual(values = brand_pal, aesthetics = "colour")
       if (".level" %in% names(roc)) {
         p <- p + labs(title = "One-vs-Rest ROC Curves (Multi-class)")
       } else {
@@ -632,7 +729,10 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
         if (!event_prob_col %in% prob_cols) event_prob_col <- prob_cols[1]
         pr_data <- yardstick::pr_curve(preds, truth = !!rlang::sym(target_col),
                                         !!rlang::sym(event_prob_col))
-        autoplot(pr_data) + theme_sensehub() + labs(title = paste0("Precision\u2013Recall Curve (event: ", event_level, ")"))
+        autoplot(pr_data) + theme_sensehub() +
+          ggplot2::scale_color_manual(values = c("#ff8c00", "#ff6600", "#e67e00", "#10b981", "#3b82f6"),
+                                     aesthetics = "colour") +
+          labs(title = paste0("Precision\u2013Recall Curve (event: ", event_level, ")"))
       }, error = function(e) {
         ggplot2::ggplot() +
           ggplot2::annotate("text", x = 0.5, y = 0.5,
@@ -682,6 +782,8 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
         lift_data <- yardstick::lift_curve(preds, truth = !!rlang::sym(target_col),
                                             !!rlang::sym(event_prob_col))
         autoplot(lift_data) + theme_sensehub() +
+          ggplot2::scale_color_manual(values = c("#ff8c00", "#ff6600", "#e67e00", "#10b981", "#3b82f6"),
+                                     aesthetics = "colour") +
           ggplot2::geom_hline(yintercept = 1, lty = 2, color = "#ccc") +
           ggplot2::labs(title = paste0("Lift Chart (event: ", event_level, ")"),
                         caption = "Values > 1 mean the model is better than random")
@@ -698,10 +800,10 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
       ggplot(rv$results$residuals_data, aes(.pred, .resid)) +
         geom_point(alpha = 0.4, color = "#ff8c00") +
         geom_hline(yintercept = 0, lty = 2, color = "#ccc") +
-        geom_smooth(method = "loess", color = "#3b82f6", se = FALSE, linewidth = 0.8) +
+        geom_smooth(method = "loess", color = "#e67e00", se = FALSE, linewidth = 0.8) +
         facet_wrap(~model) + theme_sensehub() +
         labs(title = "Residuals vs Predicted", x = "Predicted", y = "Residual",
-             caption = "Blue line = loess smoother (should be flat)")
+             caption = "Orange line = loess smoother (should be flat)")
     })
 
     output$actual_vs_pred_plot <- renderPlot({
@@ -1098,8 +1200,8 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
                                  color = "#888", outlier.color = "#ef4444") +
           ggplot2::geom_jitter(width = 0.15, alpha = 0.4, size = 1.5, color = "#333") +
           ggplot2::scale_fill_manual(
-            values = c("#ff8c00", "#ff6600", "#10b981", "#3b82f6", "#8b5cf6",
-                       "#f59e0b", "#ef4444", "#06b6d4", "#84cc16", "#ec4899")
+            values = c("#ff8c00", "#ff6600", "#e67e00", "#10b981", "#3b82f6",
+                       "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#84cc16")
           ) +
           ggplot2::coord_flip() +
           theme_sensehub() +
@@ -1116,7 +1218,61 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
       })
     })
 
-    # ---- Predictions ----
+    # ---- Predictions: distribution plot (reactive for PNG export) ----
+    pred_dist_plot_reactive <- reactive({
+      req(rv$results$predictions)
+      preds <- rv$results$predictions
+      target_col <- rv$results$config_target %||% rv$target_col
+      if (rv$problem_type == "classification") {
+        prob_cols <- grep("^\\.pred_", names(preds), value = TRUE)
+        prob_cols <- setdiff(prob_cols, c(".pred_class", ".pred"))
+        if (length(prob_cols) == 0) return(NULL)
+        truth_vec <- preds[[target_col]]
+        event_level <- levels(truth_vec)[1]
+        event_prob_col <- paste0(".pred_", event_level)
+        if (!event_prob_col %in% names(preds)) event_prob_col <- prob_cols[1]
+        vec <- preds[[event_prob_col]]
+        p <- ggplot2::ggplot(tibble::tibble(prob = vec), ggplot2::aes(x = prob)) +
+          ggplot2::geom_histogram(fill = "#ff8c00", alpha = 0.85, bins = 30, color = "white", linewidth = 0.2) +
+          theme_sensehub() +
+          ggplot2::labs(
+            title = "Distribution of predicted probabilities",
+            subtitle = sprintf("Event class: %s", event_level),
+            x = "Predicted probability", y = "Count"
+          )
+        return(p)
+      }
+      if (".pred" %in% names(preds)) {
+        p <- ggplot2::ggplot(preds, ggplot2::aes(x = .pred)) +
+          ggplot2::geom_histogram(fill = "#ff8c00", alpha = 0.85, bins = 30, color = "white", linewidth = 0.2) +
+          theme_sensehub() +
+          ggplot2::labs(title = "Distribution of predicted values", x = "Predicted", y = "Count")
+        return(p)
+      }
+      NULL
+    })
+
+    output$pred_dist_plot <- renderPlot({
+      p <- pred_dist_plot_reactive()
+      if (is.null(p)) {
+        ggplot2::ggplot() +
+          ggplot2::annotate("text", x = 0.5, y = 0.5, label = "No prediction distribution available",
+                            size = 5, color = "#999") + theme_sensehub()
+      } else {
+        p
+      }
+    })
+
+    output$dl_pred_dist_png <- downloadHandler(
+      filename = function() paste0(rv$run_id %||% "export", "_prediction_distribution.png"),
+      content  = function(file) {
+        p <- pred_dist_plot_reactive()
+        if (!is.null(p))
+          ggplot2::ggsave(file, plot = p, width = 8, height = 5, dpi = 150, bg = "white")
+      }
+    )
+
+    # ---- Predictions table ----
     output$predictions_table <- DT::renderDataTable({
       req(rv$results$predictions)
       DT::datatable(
@@ -1211,6 +1367,104 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
       content  = function(file) {
         req(rv$results$confidence$final_fit)
         saveRDS(rv$results$confidence$final_fit, file)
+      }
+    )
+
+    # ---- Export PNG buttons (shown in Export tab) ----
+    output$export_png_buttons <- renderUI({
+      req(rv$results)
+      ns <- session$ns
+      pred_dist_btn <- downloadButton(ns("dl_pred_dist_png"), tagList(icon("image"), " Prediction distribution"),
+                                      class = "btn-outline-secondary btn-sm")
+      if (rv$problem_type == "classification") {
+        btns <- tagList(
+          downloadButton(ns("dl_roc_png"), tagList(icon("image"), " ROC curve"), class = "btn-outline-secondary btn-sm"),
+          downloadButton(ns("dl_confusion_png"), tagList(icon("image"), " Confusion matrix"), class = "btn-outline-secondary btn-sm"),
+          downloadButton(ns("dl_lift_png"), tagList(icon("image"), " Lift chart"), class = "btn-outline-secondary btn-sm"),
+          pred_dist_btn
+        )
+        if (!is.null(rv$results$calibration_data) && nrow(rv$results$calibration_data) > 0)
+          btns <- tagList(btns, downloadButton(ns("dl_calibration_png"), tagList(icon("image"), " Calibration"), class = "btn-outline-secondary btn-sm"))
+        return(tags$div(class = "d-flex flex-wrap gap-2", btns))
+      }
+      tags$div(
+        class = "d-flex flex-wrap gap-2",
+        downloadButton(ns("dl_residuals_png"), tagList(icon("image"), " Residuals"), class = "btn-outline-secondary btn-sm"),
+        pred_dist_btn
+      )
+    })
+
+    # Build plot for PNG export (reuse logic from renderPlot)
+    output$dl_roc_png <- downloadHandler(
+      filename = function() paste0(rv$run_id %||% "export", "_roc.png"),
+      content  = function(file) {
+        req(rv$results$roc_data)
+        roc <- rv$results$roc_data
+        p <- autoplot(roc) + theme_sensehub()
+        if (".level" %in% names(roc)) p <- p + labs(title = "One-vs-Rest ROC Curves (Multi-class)")
+        else p <- p + labs(title = "ROC Curve")
+        ggplot2::ggsave(file, plot = p, width = 8, height = 5, dpi = 150, bg = "white")
+      }
+    )
+    output$dl_confusion_png <- downloadHandler(
+      filename = function() paste0(rv$run_id %||% "export", "_confusion.png"),
+      content  = function(file) {
+        req(rv$results$predictions)
+        preds <- rv$results$predictions
+        target_col <- rv$results$config_target %||% rv$target_col
+        if (!".pred_class" %in% names(preds)) return()
+        tryCatch({
+          cm <- yardstick::conf_mat(preds, truth = !!rlang::sym(target_col), estimate = .pred_class)
+          p <- autoplot(cm, type = "heatmap") + theme_sensehub() +
+            ggplot2::scale_fill_gradient(low = "#fff8f0", high = "#ff8c00") + labs(title = "Confusion Matrix")
+          ggplot2::ggsave(file, plot = p, width = 8, height = 5, dpi = 150, bg = "white")
+        }, error = function(e) NULL)
+      }
+    )
+    output$dl_lift_png <- downloadHandler(
+      filename = function() paste0(rv$run_id %||% "export", "_lift.png"),
+      content  = function(file) {
+        req(rv$results$predictions, rv$problem_type == "classification")
+        preds <- rv$results$predictions
+        target_col <- rv$results$config_target %||% rv$target_col
+        prob_cols <- setdiff(grep("^\\.pred_", names(preds), value = TRUE), c(".pred_class", ".pred"))
+        if (length(prob_cols) == 0) return()
+        truth_vec <- preds[[target_col]]
+        event_level <- levels(truth_vec)[1]
+        event_prob_col <- paste0(".pred_", event_level)
+        if (!event_prob_col %in% names(preds)) event_prob_col <- prob_cols[1]
+        tryCatch({
+          lift_data <- yardstick::lift_curve(preds, truth = !!rlang::sym(target_col), !!rlang::sym(event_prob_col))
+          p <- autoplot(lift_data) + theme_sensehub() +
+            ggplot2::geom_hline(yintercept = 1, lty = 2, color = "#ccc") +
+            ggplot2::labs(title = paste0("Lift Chart (event: ", event_level, ")"))
+          ggplot2::ggsave(file, plot = p, width = 8, height = 5, dpi = 150, bg = "white")
+        }, error = function(e) NULL)
+      }
+    )
+    output$dl_residuals_png <- downloadHandler(
+      filename = function() paste0(rv$run_id %||% "export", "_residuals.png"),
+      content  = function(file) {
+        req(rv$results$residuals_data)
+        p <- ggplot2::ggplot(rv$results$residuals_data, ggplot2::aes(.pred, .resid)) +
+          ggplot2::geom_point(alpha = 0.4, color = "#ff8c00") +
+          ggplot2::geom_hline(yintercept = 0, lty = 2, color = "#ccc") +
+          ggplot2::geom_smooth(method = "loess", color = "#e67e00", se = FALSE, linewidth = 0.8) +
+          ggplot2::facet_wrap(ggplot2::vars(model)) + theme_sensehub() +
+          ggplot2::labs(title = "Residuals vs Predicted", x = "Predicted", y = "Residual")
+        ggplot2::ggsave(file, plot = p, width = 8, height = 5, dpi = 150, bg = "white")
+      }
+    )
+    output$dl_calibration_png <- downloadHandler(
+      filename = function() paste0(rv$run_id %||% "export", "_calibration.png"),
+      content  = function(file) {
+        req(rv$results$calibration_data)
+        p <- ggplot2::ggplot(rv$results$calibration_data, ggplot2::aes(predicted_prob, observed_freq)) +
+          ggplot2::geom_abline(lty = 2, color = "#e8e4de") +
+          ggplot2::geom_point(size = 3, color = "#ff8c00") +
+          ggplot2::geom_line(color = "#ff8c00", linewidth = 0.8) + theme_sensehub() +
+          ggplot2::labs(title = "Reliability Curve", x = "Predicted probability", y = "Observed frequency")
+        ggplot2::ggsave(file, plot = p, width = 8, height = 5, dpi = 150, bg = "white")
       }
     )
 

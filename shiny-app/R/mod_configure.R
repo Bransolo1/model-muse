@@ -61,7 +61,7 @@ mod_configure_ui <- function(id) {
           switchInput(ns("auto_select"), label = "Auto-select",
                       value = TRUE, size = "small",
                       onLabel = "Auto", offLabel = "Manual",
-                      onStatus = "warning"),
+                      onStatus = "primary"),
           conditionalPanel(
             condition = sprintf("!input['%s']", ns("auto_select")),
             pickerInput(
@@ -230,7 +230,7 @@ mod_configure_server <- function(id, rv) {
         df$value <- factor(df$value, levels = top)
 
         ggplot2::ggplot(df, ggplot2::aes(x = value)) +
-          ggplot2::geom_bar(fill = "#3b82f6", alpha = 0.85, width = 0.7) +
+          ggplot2::geom_bar(fill = "#ff8c00", alpha = 0.85, width = 0.7) +
           theme_sensehub(base_size = 10) +
           ggplot2::theme(
             plot.margin = ggplot2::margin(4, 4, 4, 4),

@@ -58,6 +58,8 @@ ui <- page_navbar(
     tags$style(HTML("
     /* ================================================================
        SENSEHUB PREMIUM DESIGN SYSTEM v2
+       Brand-aligned with landing: https://auto-model-buddy.lovable.app/
+       Primary: orange (#ff8c00); bg: warm off-white (#f8f6f3); dark sidebar (#0f1117).
        ================================================================ */
 
     /* ---------- DESIGN TOKENS ---------- */
@@ -312,6 +314,8 @@ ui <- page_navbar(
     .form-control, .form-select {
       border-radius: var(--sh-radius-xs) !important;
       border-color: var(--sh-border) !important;
+      background-color: var(--sh-surface) !important;
+      color: var(--sh-text) !important;
       transition: var(--sh-transition) !important;
       padding: 10px 14px !important;
       font-size: 0.88rem !important;
@@ -319,6 +323,11 @@ ui <- page_navbar(
     .form-control:focus, .form-select:focus {
       border-color: var(--sh-primary) !important;
       box-shadow: 0 0 0 3px var(--sh-primary-glow) !important;
+      outline: none !important;
+    }
+    .form-select option {
+      background: var(--sh-surface) !important;
+      color: var(--sh-text) !important;
     }
     .form-control.is-valid {
       border-color: var(--sh-success) !important;
@@ -358,6 +367,8 @@ ui <- page_navbar(
       background-color: var(--sh-primary) !important;
       border-color: var(--sh-primary) !important;
     }
+    .form-check-label { color: var(--sh-text-secondary) !important; }
+    .radio-group label, .shiny-options-group label { color: var(--sh-text) !important; }
 
     /* Selectize */
     .selectize-control .selectize-input {
@@ -483,6 +494,25 @@ ui <- page_navbar(
       border-color: var(--sh-primary) !important;
       box-shadow: 0 0 0 3px var(--sh-primary-glow) !important;
       outline: none !important;
+    }
+    .dataTables_wrapper .dataTables_info { color: var(--sh-text-muted) !important; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      background: var(--sh-primary) !important;
+      border-color: var(--sh-primary) !important;
+      color: #fff !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
+      background: var(--sh-primary-light) !important;
+      border-color: var(--sh-primary) !important;
+      color: var(--sh-primary) !important;
+    }
+
+    /* ---------- PLOT CONTAINERS (brand-aligned) ---------- */
+    .shiny-plot-output {
+      border-radius: var(--sh-radius-sm);
+      overflow: hidden;
+      background: var(--sh-surface);
+      box-shadow: var(--sh-shadow-xs);
     }
 
     /* ---------- DROPDOWNS ---------- */
@@ -839,6 +869,7 @@ ui <- page_navbar(
       transform: translateX(-50%) scale(0.95);
       background: var(--sh-sidebar-bg);
       color: #e0e0e0;
+      border-left: 3px solid var(--sh-primary);
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 0.75rem;

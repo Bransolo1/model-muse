@@ -1,0 +1,6 @@
+.env
+*.rds.bak
+renv/library/
+renv/staging/
+renv/sandbox/
+renv/local/

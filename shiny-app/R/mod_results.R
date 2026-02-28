@@ -985,8 +985,11 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
       req(rv$results$importance)
       top_features <- head(rv$results$importance$variable, 10)
       ns <- session$ns
-      selectInput(ns("pdp_feature"), "Feature to plot:",
-                  choices = top_features, selected = top_features[1], width = "300px")
+      pickerInput(
+        ns("pdp_feature"), "Feature to plot:", choices = top_features,
+        selected = top_features[1], width = "300px",
+        options = list(`live-search` = TRUE, size = 8)
+      )
     })
 
     # ---- PDP plot ----

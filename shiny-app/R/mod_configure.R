@@ -23,7 +23,10 @@ mod_configure_ui <- function(id) {
         class = "sh-accent",
         card_header(tags$span(icon("bullseye", style = "color: #ff8c00; margin-right: 6px;"), "What to predict")),
         card_body(
-          selectInput(ns("target"), "Target column", choices = NULL, width = "100%"),
+          pickerInput(
+            ns("target"), "Target column", choices = NULL, width = "100%",
+            options = list(`live-search` = TRUE, size = 10, `dropdown-align` = "auto")
+          ),
           uiOutput(ns("target_summary")),
           uiOutput(ns("target_dist_ui")),
           tags$hr(style = "border-color: #e8e4de;"),
@@ -48,7 +51,10 @@ mod_configure_ui <- function(id) {
           tags$label("Success metric",
                      class = "form-label sh-tooltip",
                      `data-tooltip` = "How we rank models. Auto picks the best default."),
-          selectInput(ns("metric"), NULL, choices = c("(auto)" = "auto"), width = "100%"),
+          pickerInput(
+            ns("metric"), NULL, choices = c("(auto)" = "auto"), width = "100%",
+            options = list(`live-search` = TRUE, size = 8, `dropdown-align` = "auto")
+          ),
           uiOutput(ns("metric_note"))
         )
       ),
@@ -156,7 +162,7 @@ mod_configure_server <- function(id, rv) {
         guess_target_column(rv$raw_data, rv$schema, rv$health),
         error = function(e) cols[length(cols)]
       )
-      updateSelectInput(session, "target", choices = cols, selected = guess)
+      updatePickerInput(session, "target", choices = cols, selected = guess)
       showNotification(
         sprintf("\U0001f9e0 Guessed target: %s — change if wrong.", guess),
         type = "message", duration = 5
@@ -295,7 +301,9 @@ mod_configure_server <- function(id, rv) {
         ),
         c("(auto)" = "auto")
       )
-      updateSelectInput(session, "metric", choices = metrics)
+      prev <- input$metric
+      updatePickerInput(session, "metric", choices = metrics,
+                        selected = if (!is.null(prev) && prev %in% metrics) prev else "auto")
     }, ignoreInit = TRUE, ignoreNULL = TRUE)
 
     observeEvent(input$metric, {

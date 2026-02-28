@@ -25,7 +25,9 @@ if (!dir.exists("shiny-app")) {
   }
 }
 
-# Run validation (validate_r_app.R sets 'ok' in global env and may quit in non-interactive)
+# Signal we're sourcing validation (so validate_r_app.R won't quit when non-interactive, e.g. .bat)
+options(sensehub.validate.sourced = TRUE)
+on.exit(options(sensehub.validate.sourced = NULL), add = TRUE)
 source("validate_r_app.R")
 
 if (exists("ok") && !ok) {

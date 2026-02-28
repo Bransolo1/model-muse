@@ -106,4 +106,7 @@ if (ok) {
 } else {
   cat("Some checks failed. Fix the issues above before running the app.\n")
 }
-if (!interactive()) quit(status = if (ok) 0 else 1)
+# Only quit when run as main script (e.g. Rscript validate_r_app.R), not when sourced from launch_sensehub.R / .bat
+if (!interactive() && is.null(getOption("sensehub.validate.sourced"))) {
+  quit(status = if (ok) 0 else 1)
+}

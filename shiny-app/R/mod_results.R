@@ -2,6 +2,37 @@
 # Module: Run & Results (Step 4) — Premium Sensehub Design v2
 # ============================================================================
 
+# ---- Helper: model type metadata ----
+model_type_info <- function(wflow_id) {
+  id <- tolower(wflow_id)
+  if (grepl("glmnet", id))  return(list(icon = "chart-line",   type = "Linear",       family = "Regularized"))
+  if (grepl("ranger", id))  return(list(icon = "tree",         type = "Random Forest", family = "Ensemble"))
+  if (grepl("xgboost", id)) return(list(icon = "bolt",         type = "XGBoost",       family = "Boosted"))
+  if (grepl("svm", id))     return(list(icon = "circle-nodes", type = "SVM",           family = "Kernel"))
+  if (grepl("knn", id))     return(list(icon = "location-dot", type = "KNN",           family = "Instance"))
+  if (grepl("nb", id))      return(list(icon = "chart-pie",    type = "Naive Bayes",   family = "Probabilistic"))
+  if (grepl("dtree", id))   return(list(icon = "sitemap",      type = "Decision Tree", family = "Tree"))
+  if (grepl("mars", id))    return(list(icon = "wave-square",  type = "MARS",          family = "Spline"))
+  list(icon = "cube", type = "Model", family = "Other")
+}
+
+# ---- Helper: qualitative metric label ----
+metric_quality <- function(value, metric_id) {
+  if (is.null(value) || is.na(value)) return(list(label = "", class = "sh-badge-muted"))
+  higher_better <- !metric_id %in% c("rmse", "mae", "mape", "mn_log_loss")
+  if (higher_better) {
+    if (value >= 0.95) return(list(label = "Excellent", class = "sh-badge-success"))
+    if (value >= 0.85) return(list(label = "Good",      class = "sh-badge-info"))
+    if (value >= 0.70) return(list(label = "Fair",      class = "sh-badge-orange"))
+    return(list(label = "Poor", class = "sh-badge-danger"))
+  } else {
+    if (value <= 0.1)  return(list(label = "Excellent", class = "sh-badge-success"))
+    if (value <= 0.5)  return(list(label = "Good",      class = "sh-badge-info"))
+    if (value <= 1.0)  return(list(label = "Fair",      class = "sh-badge-orange"))
+    return(list(label = "Poor", class = "sh-badge-danger"))
+  }
+}
+
 theme_sensehub <- function(base_size = 13) {
   ggplot2::theme_minimal(base_size = base_size) +
     ggplot2::theme(
@@ -228,6 +259,8 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
 
     # ---- Validation gate ----
     output$validation_gate <- renderUI({
+      if (rv$run_status == "done" && !is.null(rv$results)) return(NULL)
+
       issues <- character(0)
       if (is.null(rv$raw_data))       issues <- c(issues, "No dataset uploaded")
       if (is.null(rv$target_col))     issues <- c(issues, "No target column selected")
@@ -514,6 +547,9 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
       if (length(plain_english) == 0)
         plain_english <- sprintf("The winning model achieves %s of %.4f.", metric_lab, best_score)
 
+      quality <- metric_quality(best_score, rv$metric)
+      best_info <- model_type_info(best_model)
+
       tags$div(
         style = "animation: cardEntrance 0.45s var(--sh-ease) both;",
         # Stat cards row
@@ -521,17 +557,28 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
           class = "d-flex gap-3 mt-3 mb-2",
           tags$div(class = "stat-card", style = "flex: 1;",
                    tags$div(class = "stat-value", sprintf("%.4f", best_score)),
-                   tags$div(class = "stat-label", paste("Best", metric_lab))),
+                   tags$div(class = "stat-label", paste("Best", metric_lab)),
+                   tags$div(class = "mt-1",
+                            tags$span(class = paste("sh-badge", quality$class),
+                                      style = "font-size: 0.65rem;", quality$label))),
           tags$div(class = "stat-card", style = "flex: 1;",
                    tags$div(class = "stat-value", style = "font-size: 1rem;", best_model),
-                   tags$div(class = "stat-label", "Best model")),
+                   tags$div(class = "stat-label", "Best model"),
+                   tags$div(class = "mt-1",
+                            tags$span(class = "sh-badge sh-badge-muted",
+                                      style = "font-size: 0.6rem;",
+                                      icon(best_info$icon, style = "font-size: 0.55rem;"),
+                                      best_info$type))),
           tags$div(class = "stat-card", style = "flex: 1;",
                    tags$div(class = "stat-value", n_models),
                    tags$div(class = "stat-label", "Models trained")),
           tags$div(class = "stat-card", style = "flex: 1;",
                    tags$div(class = "stat-value",
                             if (!is.null(rv$results$ensemble)) "\u2713" else "\u2014"),
-                   tags$div(class = "stat-label", "Ensemble"))
+                   tags$div(class = "stat-label", "Ensemble"),
+                   tags$div(class = "mt-1", style = "font-size: 0.65rem; color: #999;",
+                            if (!is.null(rv$results$ensemble)) "Blended top models"
+                            else "Not used"))
         ),
         # One-line why
         tags$p(
@@ -562,21 +609,80 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
     # ---- Leaderboard ----
     output$leaderboard <- DT::renderDataTable({
       req(rv$results$leaderboard)
-      DT::datatable(
-        rv$results$leaderboard,
-        options  = list(pageLength = 20, dom = "t", ordering = TRUE, scrollX = TRUE),
-        rownames = FALSE, class = "compact stripe hover", width = "100%"
+      lb <- rv$results$leaderboard
+
+      # Add model type column
+      lb$Type <- purrr::map_chr(lb$`Model name`, function(nm) model_type_info(nm)$type)
+
+      # Add quality label
+      lb$Quality <- purrr::map_chr(lb$`Metric (mean)`, function(v) {
+        metric_quality(v, rv$metric)$label
+      })
+
+      # Hide Notes column if all empty
+      has_notes <- any(nchar(trimws(lb$Notes)) > 0, na.rm = TRUE)
+      if (!has_notes) lb$Notes <- NULL
+
+      # Reorder: Rank, Model name, Type, Quality, Metric, SE, Runtime, [Notes]
+      col_order <- intersect(c("Rank", "Model name", "Type", "Quality",
+                                "Metric (mean)", "Metric (SE)", "Runtime", "Notes"), names(lb))
+      lb <- lb[, col_order, drop = FALSE]
+
+      dt <- DT::datatable(
+        lb,
+        options  = list(
+          pageLength = 20, dom = "t", ordering = TRUE, scrollX = TRUE,
+          columnDefs = list(
+            list(className = "dt-center", targets = "_all")
+          )
+        ),
+        rownames = FALSE, class = "compact stripe hover", width = "100%",
+        caption = htmltools::tags$caption(
+          style = "caption-side: bottom; font-size: 0.75rem; color: #999; padding-top: 8px;",
+          "SE = Standard Error of the cross-validated metric. Lower SE = more stable model."
+        )
       ) %>%
-        DT::formatStyle("Rank", fontWeight = "bold", color = "#ff8c00")
+        DT::formatStyle("Rank", fontWeight = "bold", color = "#ff8c00") %>%
+        DT::formatStyle("Quality",
+          color = DT::styleEqual(
+            c("Excellent", "Good", "Fair", "Poor"),
+            c("#10b981", "#3b82f6", "#ff8c00", "#ef4444")
+          ),
+          fontWeight = "bold"
+        )
+
+      if ("Type" %in% names(lb)) {
+        dt <- dt %>% DT::formatStyle("Type", color = "#888", fontStyle = "italic")
+      }
+      dt
     })
 
     # ---- Model cards ----
     output$model_cards <- renderUI({
       req(rv$results$model_summaries)
       summaries <- rv$results$model_summaries
+
+      # Extract best hyperparameters per model from tune results
+      best_params <- tryCatch({
+        purrr::map(summaries, function(s) {
+          tryCatch({
+            res <- workflowsets::extract_workflow_set_result(rv$results$tune_results, s$model_name)
+            bp <- tune::select_best(res, metric = rv$metric)
+            params <- bp[, !names(bp) %in% c(".config"), drop = FALSE]
+            params <- params[, purrr::map_lgl(params, function(x) !all(is.na(x))), drop = FALSE]
+            if (ncol(params) == 0) return(NULL)
+            params
+          }, error = function(e) NULL)
+        })
+      }, error = function(e) rep(list(NULL), length(summaries)))
+
       card_list <- lapply(seq_along(summaries), function(i) {
         s <- summaries[[i]]
+        info <- model_type_info(s$model_name)
+        quality <- metric_quality(s$metric_mean, rv$metric)
         rank_icon <- if (i == 1) icon("trophy", style = "color: #ff8c00;") else icon("medal", style = "color: #ccc;")
+        params <- if (i <= length(best_params)) best_params[[i]] else NULL
+
         card(
           class = "sh-accent",
           card_header(
@@ -584,20 +690,58 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
               class = "d-flex align-items-center gap-2",
               rank_icon,
               tags$span(style = "color: #ff8c00; font-weight: 700;",
-                        paste0("#", i, " ", s$model_name))
+                        paste0("#", i, " ", s$model_name)),
+              if (i == 1)
+                tags$span(class = "sh-badge sh-badge-success",
+                          style = "font-size: 0.65rem; margin-left: auto;",
+                          icon("star", style = "font-size: 0.55rem;"), "Best pick")
             )
           ),
           card_body(
+            # Type badge
+            tags$div(
+              class = "mb-2",
+              tags$span(class = "sh-badge sh-badge-muted",
+                        icon(info$icon, style = "font-size: 0.6rem;"),
+                        info$type)
+            ),
+            # Main metric
             tags$div(
               class = "stat-value", style = "font-size: 1.4rem;",
               sprintf("%.4f", s$metric_mean)
             ),
             tags$div(class = "stat-label",
                      sprintf("%s \u00b1 %.4f", metric_label(rv$metric), s$metric_se)),
+            # Quality badge
+            tags$div(class = "mt-1",
+                     tags$span(class = paste("sh-badge", quality$class),
+                               quality$label)),
+            # Runtime
             tags$div(class = "mt-2",
                      tags$span(class = "sh-badge sh-badge-muted",
                                icon("clock", style = "font-size: 0.6rem;"),
                                sprintf("%.1fs", s$runtime_secs))),
+            # Hyperparameters
+            if (!is.null(params) && ncol(params) > 0)
+              tags$details(
+                class = "mt-2",
+                style = "font-size: 0.75rem; color: #888;",
+                tags$summary(style = "cursor: pointer; font-weight: 600; color: #ff8c00;",
+                             icon("sliders", style = "font-size: 0.6rem; margin-right: 4px;"),
+                             "Hyperparameters"),
+                tags$div(
+                  style = "margin-top: 4px; padding: 6px 8px; background: #fafaf8; border-radius: 6px; font-family: 'JetBrains Mono', monospace;",
+                  lapply(names(params), function(p) {
+                    val <- params[[p]]
+                    tags$div(
+                      style = "display: flex; justify-content: space-between; padding: 2px 0;",
+                      tags$span(style = "color: #999;", p),
+                      tags$span(style = "color: #1a1a1a; font-weight: 500;",
+                                if (is.numeric(val)) sprintf("%.4g", val) else as.character(val))
+                    )
+                  })
+                )
+              ),
             if (!is.null(s$notes) && nchar(s$notes) > 0)
               tags$p(class = "small mt-2", style = "color: #999;", s$notes)
           )

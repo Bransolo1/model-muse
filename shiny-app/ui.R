@@ -135,7 +135,7 @@ ui <- page_navbar(
       border: 1px solid var(--sh-border) !important;
       box-shadow: var(--sh-shadow-sm) !important;
       transition: var(--sh-transition) !important;
-      overflow: hidden;
+      overflow: visible;
       animation: cardEntrance 0.45s var(--sh-ease) both;
     }
     .card:hover {
@@ -988,7 +988,8 @@ ui <- page_navbar(
       font-family: 'JetBrains Mono', monospace !important;
       font-size: 0.8rem !important;
       color: var(--sh-text-secondary) !important;
-      max-height: 200px;
+      min-height: 80px;
+      max-height: 400px;
       overflow-y: auto;
     }
 
@@ -1098,7 +1099,37 @@ ui <- page_navbar(
     }
 
     /* Main content area */
-    .bslib-sidebar-layout > .main { background: var(--sh-bg) !important; }
+    .bslib-sidebar-layout > .main {
+      background: var(--sh-bg) !important;
+      overflow-y: auto !important;
+    }
+
+    /* ============================================
+       RESULTS SECTION SIZING
+       ============================================ */
+    /* Ensure plot outputs have adequate minimum height */
+    .shiny-plot-output {
+      min-height: 300px !important;
+    }
+
+    /* Ensure DT tables are fully visible */
+    .dataTables_wrapper {
+      width: 100% !important;
+      min-height: 200px;
+    }
+    .dataTables_scrollBody {
+      min-height: 150px !important;
+    }
+
+    /* Tab pane content should not be height-constrained */
+    .navset-card-tab .tab-content,
+    .navset-card-tab .tab-pane {
+      overflow: visible !important;
+      min-height: auto !important;
+    }
+    .navset-card-tab .card-body {
+      overflow: visible !important;
+    }
 
     /* ============================================
        STAT CARDS (for results overview)
@@ -1402,7 +1433,7 @@ ui <- page_navbar(
     icon  = icon("wand-magic-sparkles"),
 
     layout_sidebar(
-      fillable = TRUE,
+      fillable = FALSE,
 
       sidebar = sidebar(
         width = 280,

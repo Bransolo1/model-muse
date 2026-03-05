@@ -564,8 +564,8 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
       req(rv$results$leaderboard)
       DT::datatable(
         rv$results$leaderboard,
-        options  = list(pageLength = 20, dom = "t", ordering = TRUE),
-        rownames = FALSE, class = "compact stripe hover"
+        options  = list(pageLength = 20, dom = "t", ordering = TRUE, scrollX = TRUE),
+        rownames = FALSE, class = "compact stripe hover", width = "100%"
       ) %>%
         DT::formatStyle("Rank", fontWeight = "bold", color = "#ff8c00")
     })

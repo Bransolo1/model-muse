@@ -205,7 +205,7 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
     outputOptions(output, "has_results", suspendWhenHidden = FALSE)
 
     # ---- Disable/enable run button based on status ----
-    observe({
+    shiny::observe({
       if (rv$run_status == "running") {
         shinyjs::disable("run_btn")
         shinyjs::html("run_btn", '<i class="fa fa-spinner fa-spin"></i> Training\u2026')
@@ -216,7 +216,7 @@ mod_results_server <- function(id, rv, training_limiter = NULL) {
     })
 
     # ---- Disable export buttons until results exist ----
-    observe({
+    shiny::observe({
       export_ids <- c("export_bundle", "dl_predictions", "dl_leaderboard",
                       "dl_leaderboard_json", "dl_fitted_model")
       if (is.null(rv$results)) {

@@ -339,7 +339,7 @@ mod_advanced_server <- function(id, rv) {
       )
     })
 
-    observe({
+    shiny::observe({
       rv$advanced <- list(
         tuning_budget    = input$tuning_budget    %||% "standard",
         cv_folds         = input$cv_folds         %||% 5,

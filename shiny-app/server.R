@@ -94,7 +94,7 @@ server <- function(input, output, session) {
   })
 
   # ---- Step gating: disable inaccessible steps via JS ----
-  observe({
+  shiny::observe({
     sc <- step_complete()
     session$sendCustomMessage("stepGating", list(
       upload    = sc$upload,

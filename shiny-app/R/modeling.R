@@ -191,6 +191,21 @@ yardstick_metric <- function(metric_id) {
   )
 }
 
+yardstick_metric_set <- function(metric_id) {
+  switch(metric_id,
+    roc_auc     = yardstick::metric_set(yardstick::roc_auc),
+    pr_auc      = yardstick::metric_set(yardstick::pr_auc),
+    mn_log_loss = yardstick::metric_set(yardstick::mn_log_loss),
+    accuracy    = yardstick::metric_set(yardstick::accuracy),
+    f_meas      = yardstick::metric_set(yardstick::f_meas),
+    rmse        = yardstick::metric_set(yardstick::rmse),
+    mae         = yardstick::metric_set(yardstick::mae),
+    rsq         = yardstick::metric_set(yardstick::rsq),
+    mape        = yardstick::metric_set(yardstick::mape),
+    yardstick::metric_set(yardstick::rmse)
+  )
+}
+
 
 # ---- validate_config() ----
 validate_config <- function(data, config) {
@@ -545,7 +560,7 @@ get_grid_size <- function(tuning_budget) {
 # ---- train_and_tune() ----
 train_and_tune <- function(wflowset, folds, config) {
   metric_fn <- yardstick_metric(config$metric)
-  metric_set <- yardstick::metric_set(metric_fn)
+  metric_set <- yardstick_metric_set(config$metric)
 
   grid_size <- get_grid_size(config$advanced$tuning_budget)
 
@@ -585,6 +600,21 @@ train_and_tune <- function(wflowset, folds, config) {
       grid = grid_size, control = ctrl, seed = config$seed
     )
   }
+
+  # Filter out workflows that produced no results (e.g., models incompatible
+  # with the chosen metric or that failed during all resamples)
+  has_results <- purrr::map_lgl(results$result, function(r) {
+    tryCatch({
+      !is.null(r) && inherits(r, "tune_results") &&
+        nrow(tune::collect_metrics(r)) > 0
+    }, error = function(e) FALSE)
+  })
+  if (any(!has_results)) {
+    failed_ids <- results$wflow_id[!has_results]
+    message("Dropping workflows with no results: ", paste(failed_ids, collapse = ", "))
+    results <- results[has_results, ]
+  }
+  if (nrow(results) == 0) stop("All model workflows failed. Check the data or try a different configuration.")
 
   results
 }
@@ -903,6 +933,11 @@ compute_shap_values <- function(final_fit, train_data, config, n_obs = 1) {
 
 # ---- run_full_pipeline() ----
 run_full_pipeline <- function(data, config) {
+  # Ensure parsnip extension packages are loaded in future workers
+  suppressPackageStartupMessages({
+    require(discrim, quietly = TRUE)
+    if (exists("HAS_EARTH") && isTRUE(HAS_EARTH)) require(earth, quietly = TRUE)
+  })
   log <- character(0)
   log <- c(log, sprintf("[%s] Building preprocessing recipes\u2026",
                         format(Sys.time(), "%H:%M:%S")))
@@ -1045,7 +1080,7 @@ run_full_pipeline <- function(data, config) {
     if (requireNamespace("vip", quietly = TRUE) && !is.null(confidence$final_fit)) {
       final_fitted <- confidence$final_fit$.workflow[[1]]
       metric_fn <- yardstick_metric(config$metric)
-      metric_set_fn <- yardstick::metric_set(metric_fn)
+      metric_set_fn <- yardstick_metric_set(config$metric)
       imp <- vip::vi(final_fitted, method = "permute",
                      train = rsample::training(resample_obj$split),
                      target = config$target, metric = metric_set_fn, nsim = 5)

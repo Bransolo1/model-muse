@@ -36,7 +36,9 @@ test_dir("tests/", reporter = "summary")
 
 ### Known issues
 
-- The Shiny app UI loads correctly, but sessions crash on initialization with Shiny 1.13.0 / R 4.5.2 due to a reactive context error at `server.R` line 97. The CI uses R 4.3.2, which may have a different Shiny version. This is a pre-existing issue.
+- The `infer` package (loaded by `library(tidymodels)`) masks `shiny::observe()`. All `observe()` calls in `server.R` and modules use `shiny::observe()` to avoid this conflict.
+- The `discrim` parsnip extension must be loaded inside `run_full_pipeline()` (via `require(discrim)`) for future workers to find `naive_Bayes` implementations.
+- Some model workflows (e.g., naive_Bayes with normalized preprocessing) may fail during tuning; the pipeline now filters these out gracefully.
 - React tests in `src/pages/Index.test.tsx` and `src/pages/QuickStart.test.tsx` have pre-existing failures (7 of 14 tests fail) due to React testing library compatibility issues ("Should not already be working" errors).
 - ESLint reports 1 pre-existing error in `tailwind.config.ts` (`@typescript-eslint/no-require-imports`) and 2 warnings.
 
